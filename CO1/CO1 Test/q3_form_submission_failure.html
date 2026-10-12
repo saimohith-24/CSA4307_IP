@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIMATS Student Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #dcecff, #eef3ff);
+            color: #12345a;
+        }
+
+        header {
+            background: white;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 2px 8px #ccd6e2;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #082b55;
+        }
+
+        .login-box {
+            background: white;
+            max-width: 350px;
+            margin: 55px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #c5d4e8;
+        }
+
+        .icon {
+            width: 65px;
+            height: 65px;
+            background: #0866cc;
+            color: white;
+            border-radius: 50%;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #082b55;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 10px 0 18px;
+            border: 1px solid #bdcddd;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #0866cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #082b55;
+        }
+
+        #message {
+            display: none;
+            background: #d8f8e1;
+            color: #176534;
+            padding: 12px;
+            margin-top: 18px;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        footer {
+            background: #082b55;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SIMATS ENGINEERING</h1>
+    <p>Student Portal</p>
+</header>
+
+<div class="login-box">
+    <div class="icon">&#128100;</div>
+
+    <h2>Student Login</h2>
+    <p class="subtitle">Welcome back! Login to continue.</p>
+
+    <form id="loginForm">
+        <label>Username</label>
+        <input type="text" name="username"
+               placeholder="Enter your username" required>
+
+        <label>Password</label>
+        <input type="password" name="password"
+               placeholder="Enter your password" required>
+
+        <button type="submit">Login</button>
+
+        <div id="message">
+            Login Submitted Successfully!
+        </div>
+    </form>
+</div>
+
+<footer>
+    <p>&copy; 2026 SIMATS Engineering</p>
+</footer>
+
+<script>
+    document.getElementById("loginForm")
+    .addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        document.getElementById("message").style.display = "block";
+        this.reset();
+    });
+</script>
+
+</body>
+</html>

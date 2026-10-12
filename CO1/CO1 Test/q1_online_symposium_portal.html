@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIMATS Symposium Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #edf4fb;
+            color: #12345a;
+        }
+
+        header {
+            background: #082b55;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        section {
+            background: white;
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #c5d3e3;
+        }
+
+        h2 {
+            text-align: center;
+            color: #075bbb;
+        }
+
+        input, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 8px 0 16px;
+            border: 1px solid #bdcddd;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #0866cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #082b55;
+        }
+
+        #message {
+            display: none;
+            background: #d8f8e1;
+            color: #176534;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        footer {
+            background: #082b55;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SIMATS ENGINEERING</h1>
+    <p>Technical Symposium 2026</p>
+    <p>Innovate | Learn | Share | Grow</p>
+</header>
+
+<section>
+    <h2>Registration Form</h2>
+    <p style="text-align:center">
+        Register for our college symposium!
+    </p>
+
+    <form id="registerForm">
+        <label>Full Name</label>
+        <input type="text" name="name"
+               placeholder="Enter your name" required>
+
+        <label>Email Address</label>
+        <input type="email" name="email"
+               placeholder="Enter your email" required>
+
+        <label>Department</label>
+        <select name="department" required>
+            <option value="">Select Department</option>
+            <option>CSE</option>
+            <option>IT</option>
+            <option>ECE</option>
+            <option>EEE</option>
+            <option>Mechanical</option>
+        </select>
+
+        <button type="submit">Register Now</button>
+    </form>
+
+    <div id="message">
+        Registration Submitted Successfully!
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2026 SIMATS Engineering</p>
+</footer>
+
+<script>
+    document.getElementById("registerForm")
+    .addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        document.getElementById("message").style.display = "block";
+        this.reset();
+    });
+</script>
+
+</body>
+</html>
