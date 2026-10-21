@@ -1,0 +1,85 @@
+* {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f5f9;
+    color: #333;
+}
+header {
+    background: #1769aa;
+    color: white;
+    text-align: center;
+    padding: 22px;
+}
+header h1 { margin: 0 0 8px; }
+nav {
+    background: #222;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+nav a { color: white; text-decoration: none; }
+nav a:hover { color: #ffdd57; }
+section { padding: 25px 20px; text-align: center; }
+.welcome { background: #dceeff; padding: 40px 20px; }
+.categories {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.categories a {
+    background: white;
+    color: #1769aa;
+    padding: 14px 20px;
+    border-radius: 7px;
+    text-decoration: none;
+    box-shadow: 0 2px 5px #ddd;
+}
+.products {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.card {
+    background: white;
+    width: 250px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #ccc;
+    transition: transform 0.2s;
+}
+.card:hover { transform: translateY(-5px); }
+.emoji { font-size: 45px; }
+.btn {
+    display: inline-block;
+    background: #1769aa;
+    color: white;
+    padding: 10px 14px;
+    margin: 5px 2px;
+    border-radius: 5px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+.btn:hover { background: #0d4777; }
+.secondary { background: #198754; }
+.secondary:hover { background: #11653e; }
+#offers { background: #fff2cc; }
+footer {
+    background: #222;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+footer a { color: #ffdd57; text-decoration: none; }
+@media (max-width: 500px) {
+    nav { gap: 14px; }
+    .card { width: 100%; max-width: 330px; }
+}

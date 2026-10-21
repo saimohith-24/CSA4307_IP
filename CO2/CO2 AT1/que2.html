@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <link rel="stylesheet" href="que2.css">
+</head>
+<body>
+<header>
+    <h1>Student Registration</h1>
+    <p>Fill in the details to register</p>
+</header>
+<nav>
+    <a href="que1.html">Home</a>
+    <a href="que2.html">Registration</a>
+    <a href="que3.html">Dashboard</a>
+</nav>
+<div class="form-box">
+    <h2>Create Your Account</h2>
+    <form id="registerForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" required placeholder="Enter your full name">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" required placeholder="example@gmail.com">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" required maxlength="10" inputmode="numeric" placeholder="10-digit mobile number">
+        <label for="password">Password</label>
+        <input type="password" id="password" required minlength="6" placeholder="At least 6 characters">
+        <label>Gender</label>
+        <div class="radio-group">
+            <label><input type="radio" name="gender" value="Male" required> Male</label>
+            <label><input type="radio" name="gender" value="Female"> Female</label>
+            <label><input type="radio" name="gender" value="Other"> Other</label>
+        </div>
+        <label for="course">Choose Course</label>
+        <select id="course" required>
+            <option value="">-- Select a course --</option>
+            <option>Computer Science</option>
+            <option>Information Technology</option>
+            <option>Artificial Intelligence</option>
+            <option>Electronics</option>
+        </select>
+        <label class="check">
+            <input type="checkbox" id="agree" required>
+            I agree to the terms and conditions
+        </label>
+        <p id="error" role="alert"></p>
+        <button type="submit">Submit Registration</button>
+        <button type="reset" class="reset">Reset Form</button>
+    </form>
+    <div class="links">
+        <a class="btn" href="que1.html">Back to Shopping</a>
+        <a class="btn green" href="que3.html">Open Dashboard</a>
+    </div>
+</div>
+<script>
+const form = document.getElementById("registerForm");
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value;
+    const error = document.getElementById("error");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^[6-9]\d{9}$/;
+    if (name.length < 2) {
+        error.textContent = "Please enter your full name.";
+    } else if (!emailPattern.test(email)) {
+        error.textContent = "Please enter a valid email.";
+    } else if (!phonePattern.test(phone)) {
+        error.textContent = "Enter a valid 10-digit Indian mobile number.";
+    } else if (password.length < 6) {
+        error.textContent = "Password must contain at least 6 characters.";
+    } else {
+        error.textContent = "";
+        window.location.href = "que3.html";
+    }
+});
+form.addEventListener("reset", function() {
+    document.getElementById("error").textContent = "";
+});
+</script>
+</body>
+</html>

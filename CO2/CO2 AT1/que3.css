@@ -1,0 +1,101 @@
+* { box-sizing: border-box; scroll-behavior: smooth; }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f5f9;
+    color: #333;
+}
+header {
+    background: #1769aa;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+header h1 { margin: 0 0 8px; }
+nav {
+    background: #222;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+nav a { color: white; text-decoration: none; }
+nav a:hover { color: #ffdd57; }
+.layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 20px;
+    padding: 20px;
+    align-items: start;
+}
+.sidebar {
+    background: #222;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+.sidebar h2 { margin-top: 0; }
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px 5px;
+    border-bottom: 1px solid #444;
+}
+.sidebar a:hover { background: #1769aa; }
+main { min-width: 0; }
+main h2 { color: #1769aa; }
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #ddd;
+}
+.card h3 { color: #1769aa; }
+.card p { font-size: 24px; font-weight: bold; }
+.card a, .button {
+    display: inline-block;
+    background: #1769aa;
+    color: white;
+    text-decoration: none;
+    padding: 10px 13px;
+    border-radius: 5px;
+    margin: 4px 2px;
+}
+.card a:hover, .button:hover { background: #0d4777; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.green { background: #198754; }
+.orange { background: #e67e22; }
+.gray { background: #666; }
+.notice {
+    background: #d9f5e5;
+    padding: 18px;
+    margin-top: 22px;
+    border-radius: 8px;
+}
+.notice h3 { color: #176b40; }
+footer {
+    background: #222;
+    color: white;
+    text-align: center;
+    padding: 18px;
+    margin-top: 15px;
+}
+footer a { color: #ffdd57; text-decoration: none; }
+@media (max-width: 750px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sidebar h2 { width: 100%; }
+    .sidebar a { padding: 10px; }
+}
+@media (max-width: 480px) {
+    .cards { grid-template-columns: 1fr; }
+    .layout { padding: 12px; }
+    .card { padding: 18px; }
+}
