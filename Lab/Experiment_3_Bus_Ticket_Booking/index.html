@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BusGo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">BusGo</a>
+    <nav>
+      <a href="#explore">Explore</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">INTERNET PROGRAMMING LAB · EXPERIMENT 3</p>
+        <h1>BusGo</h1>
+        <p>Search routes, choose a bus, and submit passenger details.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#explore">Get Started</a>
+          <button class="button secondary" type="button" onclick="showNotice('Welcome! Choose an option below to continue.')">Quick Help</button>
+        </div>
+      </div>
+      <div class="hero-card">
+        <span class="hero-icon">🚌</span>
+        <h2>Plan with confidence</h2>
+        <p>A simple interactive demo website for the lab question.</p>
+        <span class="status"><span></span> Demo mode</span>
+      </div>
+    </section>
+
+    <section id="explore" class="section">
+      <div class="section-heading">
+        <div><p class="eyebrow">DISCOVER</p><h2>Explore options</h2></div>
+        <p>Choose an option to open its page.</p>
+      </div>
+      <div class="card-grid">
+        <article class="info-card">
+          <span class="card-icon">📖</span>
+          <h3>Search Buses</h3><p>Enter your starting point, destination, and travel date.</p>
+          <button class="text-link" onclick="openPanel('Search Buses', 'Enter your starting point, destination, and travel date.')">Open section →</button>
+        </article>
+<article class="info-card">
+          <span class="card-icon">🗂️</span>
+          <h3>My Tickets</h3><p>View your ticket details and booking history.</p>
+          <button class="text-link" onclick="openPanel('My Tickets', 'View your ticket details and booking history.')">Open section →</button>
+        </article>
+<article class="info-card">
+          <span class="card-icon">🔎</span>
+          <h3>Help & Feedback</h3><p>Send feedback about a route or bus service.</p>
+          <button class="text-link" onclick="openPanel('Help & Feedback', 'Send feedback about a route or bus service.')">Open section →</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="services" class="section feature-section">
+      <div class="section-heading">
+        <div><p class="eyebrow">QUICK ACTIONS</p><h2>Useful tools</h2></div>
+      </div>
+      <div class="action-grid">
+        <button class="action-card" onclick="openPanel('Login', 'Enter your demo username and password below.')"><span>01</span><b>Login</b><small>Access your account</small></button>
+        <button class="action-card" onclick="openPanel('Register', 'Create a demo account using the registration form.')"><span>02</span><b>Register</b><small>Join the platform</small></button>
+        <button class="action-card" onclick="openPanel('Check Status', 'Your sample status is ready to view: Demo confirmed.')"><span>03</span><b>Check Status</b><small>View current status</small></button>
+        <button class="action-card" onclick="openPanel('Contact Support', 'Send a message using the contact form below.')"><span>04</span><b>Contact Support</b><small>Get assistance</small></button>
+      </div>
+    </section>
+
+    <section class="section form-section" id="contact">
+      <div class="form-intro">
+        <p class="eyebrow">TAKE THE NEXT STEP</p>
+        <h2>Submit your details</h2>
+        <p>This is a front-end lab demonstration. It does not process real bookings, payments, or accounts.</p>
+      </div>
+      <form id="demoForm">
+        <label for="fullName">Full name</label>
+        <input id="fullName" name="fullName" placeholder="Enter your name" required>
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" required>
+        <label for="choice">Select an option</label>
+        <select id="choice" name="choice" required>
+          <option value="">Choose one</option>
+          <option value="Chennai → Bengaluru">Chennai → Bengaluru</option>
+<option value="Chennai → Coimbatore">Chennai → Coimbatore</option>
+<option value="Chennai → Madurai">Chennai → Madurai</option>
+<option value="Chennai → Pondicherry">Chennai → Pondicherry</option>
+        </select>
+        <button class="button primary full" type="submit">Submit Details</button>
+        <p id="formMessage" class="form-message" role="status"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer><b>BusGo</b><span>Internet Programming Lab · Experiment 3</span></footer>
+
+  <div class="modal-backdrop" id="modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="close" aria-label="Close" onclick="closePanel()">×</button>
+      <p class="eyebrow">INTERACTIVE DEMO</p>
+      <h2 id="modalTitle">Details</h2>
+      <p id="modalText"></p>
+      <div id="modalExtra"></div>
+      <button class="button primary" onclick="closePanel()">Okay</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
