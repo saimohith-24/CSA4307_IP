@@ -1,0 +1,40 @@
+CSA43 – INTERNET PROGRAMMING
+CO-2 ASSESSMENT TOOL 2 – DESIGN TASK
+Total: 20 marks (5 questions × 4 marks)
+
+QUESTION 1: RESPONSIVE NAVIGATION BAR DESIGN
+(a) Key components: brand/logo, Home and Products links, other useful categories, cart indicator, and a menu toggle for small screens.
+(b) The navigation uses Flexbox to align the logo, links and cart. CSS media queries adjust the layout for tablet/mobile screens.
+(c) At widths of 800px and below, the links are hidden and a hamburger button appears. Clicking it opens/closes the menu. JavaScript updates aria-expanded.
+(d) Usability: labels are clear, controls have keyboard focus styles, and the cart is visible. Improvements could include search, account access, and testing with screen readers and real users.
+
+QUESTION 2: PRODUCT HOVER EFFECT
+(a) CSS properties used include transform, box-shadow, and background-color.
+(b) A short transition animates the card lift and image scaling. The design also supports keyboard focus through :focus-within.
+(c) The product cards lift slightly and gain a stronger shadow when hovered or focused. The Add to cart buttons respond to clicks and update the cart count.
+(d) Keep animations brief and lightweight. Avoid large layout changes, respect prefers-reduced-motion, and ensure information remains available without hover on touchscreens.
+
+QUESTION 3: LAYOUT SELECTION (FLEXBOX VS GRID)
+(a) A dashboard needs aligned metric cards, consistent gaps, and a full-width activity panel.
+(b) Flexbox is best for one-dimensional alignment (a row or column). CSS Grid is suited to two-dimensional layouts with rows and columns.
+(c) CSS Grid is selected for the dashboard because it aligns multiple metric cards in columns and lets the activity panel span the full row. Flexbox is used in the navigation and smaller alignment tasks.
+(d) Grid is scalable with repeat(), minmax(), and media queries. The design switches to fewer columns on smaller screens to avoid horizontal scrolling.
+
+QUESTION 4: MOBILE-FIRST BLOG LAYOUT
+(a) Key sections: header/navigation, blog heading, article cards with title and summary, links, and footer.
+(b) The CSS starts with simple, readable card layouts and flexible spacing, then uses media queries for wider screens.
+(c) At wider screens the blog cards appear in two columns. At small widths they stack or use a compact single-card arrangement.
+(d) Use readable font sizes, semantic headings, descriptive links, sufficient contrast, visible keyboard focus, and responsive spacing. Further improvements include testing zoom and screen-reader navigation.
+
+QUESTION 5: JAVASCRIPT EVENT HANDLING FOR DYNAMIC MENU
+(a) The click event is used for the hamburger toggle and navigation links. Hover is handled with CSS for visual feedback, which is more suitable than requiring JavaScript for simple hover styling.
+(b) The click handler toggles the open class on the navigation and updates aria-expanded.
+(c) Selecting a navigation link closes the menu. The demo button and Add to cart buttons also respond to click events.
+(d) Event listeners are attached once, the code is separated into script.js, and aria-expanded supports assistive technology. Improvements could include Escape-key handling and more comprehensive keyboard/screen-reader testing.
+
+ACADEMIC INTEGRITY
+Review the implementation and explanations, test the website yourself, and edit the submission in your own words where required.
+
+Student Name: __________________________
+Register Number: _______________________
+Signature: ______________________________

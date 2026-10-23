@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopEase | Design Task</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="#">ShopEase</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation"
+      aria-expanded="false" aria-controls="mainNav">☰</button>
+    <nav class="main-nav" id="mainNav">
+      <a href="#home">Home</a>
+      <a href="#products">Products</a>
+      <a href="#blog">Blog</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="cart" href="#products">🛒 Cart <span id="cartCount">0</span></a>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <p class="eyebrow">CSA43 · CO-2 · DESIGN TASK</p>
+      <h1>Good design makes shopping simple.</h1>
+      <p>A responsive e-commerce demo showing navigation, product hover effects, CSS layouts, a mobile-first blog and JavaScript events.</p>
+      <a class="primary-btn" href="#products">Explore products</a>
+    </section>
+
+    <section class="section" id="products">
+      <div class="section-heading">
+        <div><p class="eyebrow">QUESTION 2</p><h2>Featured products</h2></div>
+        <p>Hover or focus on a card to see the interaction.</p>
+      </div>
+      <div class="product-grid">
+        <article class="product-card">
+          <div class="product-art headphones" aria-hidden="true">🎧</div>
+          <div class="product-info"><span class="tag">Popular</span><h3>Studio Headphones</h3><p>Comfortable sound for everyday listening.</p><div class="product-bottom"><strong>₹1,499</strong><button class="add-btn">Add to cart</button></div></div>
+        </article>
+        <article class="product-card">
+          <div class="product-art watch" aria-hidden="true">⌚</div>
+          <div class="product-info"><span class="tag">New</span><h3>Smart Watch</h3><p>Keep your day organised at a glance.</p><div class="product-bottom"><strong>₹2,299</strong><button class="add-btn">Add to cart</button></div></div>
+        </article>
+        <article class="product-card">
+          <div class="product-art speaker" aria-hidden="true">🔊</div>
+          <div class="product-info"><span class="tag">Bestseller</span><h3>Portable Speaker</h3><p>Bring your favourite music anywhere.</p><div class="product-bottom"><strong>₹999</strong><button class="add-btn">Add to cart</button></div></div>
+        </article>
+      </div>
+      <p class="status-message" id="cartMessage" aria-live="polite">Your cart is empty.</p>
+    </section>
+
+    <section class="section dashboard-section" id="dashboard">
+      <div class="section-heading"><div><p class="eyebrow">QUESTION 3</p><h2>Store dashboard</h2></div><p>CSS Grid is useful for two-dimensional layouts.</p></div>
+      <div class="dashboard-grid">
+        <article class="metric"><span>Orders today</span><strong>128</strong><small>+12% this week</small></article>
+        <article class="metric"><span>Revenue</span><strong>₹42.8K</strong><small>Sales summary</small></article>
+        <article class="metric"><span>Customers</span><strong>864</strong><small>Active shoppers</small></article>
+        <article class="dashboard-panel"><h3>Recent activity</h3><ul><li>New order received <span>2 min ago</span></li><li>Product stock updated <span>18 min ago</span></li><li>Customer registered <span>32 min ago</span></li></ul></article>
+      </div>
+    </section>
+
+    <section class="section blog-section" id="blog">
+      <div class="section-heading"><div><p class="eyebrow">QUESTION 4</p><h2>From the blog</h2></div><p>Mobile-first layout: one column first, more columns on wider screens.</p></div>
+      <div class="blog-grid">
+        <article class="blog-card"><div class="blog-art art-one">01</div><div class="blog-copy"><p class="eyebrow">BUYING GUIDE</p><h3>How to choose everyday headphones</h3><p>Look for comfort, battery life, and sound that suits your listening habits.</p><a href="#contact">Read article →</a></div></article>
+        <article class="blog-card"><div class="blog-art art-two">02</div><div class="blog-copy"><p class="eyebrow">SMART LIVING</p><h3>Small tech upgrades that help</h3><p>Simple devices can make routines easier when they solve a real need.</p><a href="#contact">Read article →</a></div></article>
+      </div>
+    </section>
+
+    <section class="section interaction-section" id="contact">
+      <p class="eyebrow">QUESTION 5</p><h2>Try the dynamic menu</h2>
+      <p>Use the menu button on mobile, or activate the links with a keyboard. This demo uses click events and accessible state attributes.</p>
+      <button class="primary-btn" id="demoButton">Test JavaScript event</button>
+      <p id="demoMessage" class="status-message" aria-live="polite">Waiting for interaction…</p>
+    </section>
+  </main>
+
+  <footer><a class="logo" href="#home">ShopEase</a><p>Internet Programming · CSA43 · CO-2 Design Task</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>
