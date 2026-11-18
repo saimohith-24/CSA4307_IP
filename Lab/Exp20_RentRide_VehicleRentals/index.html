@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentRide | Vehicle Rental System</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f4f4f5; color: #18181b; }
+  header { background: #18181b; color: #facc15; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #27272a; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #facc15; color: #18181b; font-weight: bold; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .btn { background: #18181b; color: #facc15; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #d4d4d8; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>RentRide</h1>
+  <nav>
+    <button class="active" onclick="tab('fleet', this)">Browse Fleet</button>
+    <button onclick="tab('myBookings', this)">My Reservations</button>
+    <button onclick="tab('admin', this)">Admin Panel</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="fleet" class="view active">
+    <div class="card" style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
+      <select id="typeFilter" onchange="render()"><option value="">All Vehicle Types</option><option>Hatchback</option><option>Sedan</option><option>SUV</option></select>
+      <label>Rental Days: <input type="number" id="daysInput" value="2" min="1" style="width:70px;" onchange="render()"></label>
+    </div>
+    <div class="grid" id="fleetGrid"></div>
+  </div>
+
+  <div id="myBookings" class="view">
+    <div class="card">
+      <h2>My Vehicle Reservations</h2>
+      <div id="userResList"></div>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h3>Add New Vehicle to Fleet</h3>
+      <input id="vName" placeholder="Model Name (e.g., Mahindra XUV700)">
+      <select id="vType"><option>Hatchback</option><option>Sedan</option><option>SUV</option></select>
+      <input id="vRate" type="number" placeholder="Daily Rate (₹)">
+      <button class="btn" onclick="addVehicle()">Add Vehicle</button>
+    </div>
+    <div class="card">
+      <h3>Approve Customer Bookings</h3>
+      <div id="adminResList"></div>
+    </div>
+  </div>
+</div>
+<script>
+let vehicles = [
+  { id: 1, name: "Maruti Swift AMT", type: "Hatchback", rate: 1400, fuel: "Petrol" },
+  { id: 2, name: "Honda City ZX", type: "Sedan", rate: 2200, fuel: "Petrol" },
+  { id: 3, name: "Toyota Innova Crysta", type: "SUV", rate: 3500, fuel: "Diesel" }
+];
+let reservations = [];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function bookCar(id) {
+  const v = vehicles.find(x => x.id === id);
+  const days = parseInt(document.getElementById('daysInput').value) || 1;
+  const cust = prompt("Enter Driver Name & License No:");
+  if(!cust) return;
+  reservations.push({ id: "RNT-" + (301 + reservations.length), car: v.name, cust, days, total: v.rate * days, status: "Pending Approval" });
+  alert(`Booked ${v.name} for ${days} day(s)!`);
+  render();
+}
+
+function addVehicle() {
+  const name = document.getElementById('vName').value.trim();
+  const type = document.getElementById('vType').value;
+  const rate = parseInt(document.getElementById('vRate').value);
+  if(!name || !rate) return;
+  vehicles.push({ id: Date.now(), name, type, rate, fuel: "Petrol" });
+  render();
+}
+
+function approveRes(i) { reservations[i].status = "Approved & Ready"; render(); }
+
+function render() {
+  const t = document.getElementById('typeFilter').value;
+  const days = parseInt(document.getElementById('daysInput').value) || 1;
+  document.getElementById('fleetGrid').innerHTML = vehicles
+    .filter(v => !t || v.type === t)
+    .map(v => `
+      <div class="card">
+        <small>${v.type} • ${v.fuel}</small>
+        <h3 style="margin:0.4rem 0;">${v.name}</h3>
+        <p>₹${v.rate}/day • <strong>Total (${days}d): ₹${v.rate * days}</strong></p>
+        <button class="btn" style="margin-top:0.8rem;" onclick="bookCar(${v.id})">Book Now</button>
+      </div>
+    `).join('');
+
+  document.getElementById('userResList').innerHTML = reservations.map(r =>
+    `<p style="padding:0.5rem 0; border-bottom:1px solid #e4e4e7;"><strong>${r.id}</strong>: ${r.car} (${r.days} days) — ₹${r.total} | Status: <b>${r.status}</b></p>`
+  ).join('') || "<p>No bookings yet.</p>";
+
+  document.getElementById('adminResList').innerHTML = reservations.map((r, i) =>
+    `<p style="padding:0.5rem 0;">${r.id} | ${r.cust} | ${r.car} — <b>${r.status}</b> ${r.status.includes('Pending') ? `<button class="btn" onclick="approveRes(${i})">Approve</button>` : ''}</p>`
+  ).join('') || "<p>No pending approvals.</p>";
+}
+render();
+</script>
+</body>
+</html>

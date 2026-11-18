@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wanderlust Travels | Packages & Stays</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f0f9ff; color: #0c4a6e; }
+  header { background: #0369a1; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #0284c7; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #38bdf8; color: #082f49; font-weight: bold; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .btn { background: #0284c7; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input { padding: 0.55rem; border: 1px solid #bae6fd; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Wanderlust Travels</h1>
+  <nav>
+    <button class="active" onclick="tab('explore', this)">Explore Destinations</button>
+    <button onclick="tab('bookings', this)">My Trips</button>
+    <button onclick="tab('admin', this)">Admin Manager</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="explore" class="view active">
+    <div class="grid" id="destGrid"></div>
+  </div>
+
+  <div id="bookings" class="view">
+    <div class="card">
+      <h2>My Confirmed Travel & Hostel Bookings</h2>
+      <div id="tripList"></div>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Add New Destination Package</h2>
+      <input id="tPlace" placeholder="Destination (e.g., Munnar Hills)">
+      <input id="tRoute" placeholder="Route (e.g., Kochi -> Munnar)">
+      <input id="tFood" placeholder="Local Food Highlight">
+      <input id="tStay" placeholder="Hostel / Hotel Name">
+      <input id="tCost" type="number" placeholder="Package Price (₹)">
+      <button class="btn" onclick="addDest()">Publish Package</button>
+    </div>
+  </div>
+</div>
+<script>
+let destinations = [
+  { id: 1, place: "Puducherry French Quarter", route: "Chennai ECR -> White Town", food: "Seafood Crepes & Filter Coffee", stay: "Promenade Heritage Hostel", cost: 4500 },
+  { id: 2, place: "Coorg Coffee Estates", route: "Bangalore -> Mysuru -> Madikeri", food: "Pandi Curry & Kodava Akki Roti", stay: "Misty Woods Homestay", cost: 6800 },
+  { id: 3, place: "Hampi Heritage Ruins", route: "Guntur -> Hospet -> Hampi", food: "North Karnataka Jolada Rotti", stay: "Boulder View Backpackers", cost: 5200 }
+];
+let trips = [];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function bookTrip(id) {
+  const d = destinations.find(x => x.id === id);
+  const guests = parseInt(prompt("Number of Travelers:", "2")) || 1;
+  trips.push({ place: d.place, stay: d.stay, guests, total: d.cost * guests });
+  alert(`Booked ${d.place} for ${guests} guest(s)!`);
+  render();
+}
+
+function addDest() {
+  const place = document.getElementById('tPlace').value.trim();
+  const route = document.getElementById('tRoute').value.trim();
+  const food = document.getElementById('tFood').value.trim();
+  const stay = document.getElementById('tStay').value.trim();
+  const cost = parseInt(document.getElementById('tCost').value);
+  if(!place || !cost) return;
+  destinations.push({ id: Date.now(), place, route, food, stay, cost });
+  render();
+}
+
+function render() {
+  document.getElementById('destGrid').innerHTML = destinations.map(d => `
+    <div class="card">
+      <h3>${d.place}</h3>
+      <p style="margin:0.4rem 0;"><strong>Route:</strong> ${d.route}</p>
+      <p style="margin:0.4rem 0;"><strong>Stay:</strong> ${d.stay}</p>
+      <p style="margin:0.4rem 0;"><strong>Food:</strong> ${d.food}</p>
+      <p style="font-size:1.2rem; font-weight:bold; color:#0284c7; margin:0.6rem 0;">₹${d.cost} / person</p>
+      <button class="btn" onclick="bookTrip(${d.id})">Book Accommodation & Tour</button>
+    </div>
+  `).join('');
+
+  document.getElementById('tripList').innerHTML = trips.map(t =>
+    `<p style="padding:0.6rem 0; border-bottom:1px solid #e0f2fe;"><strong>${t.place}</strong> (${t.stay}) — ${t.guests} Guests | Total Paid: <b>₹${t.total}</b></p>`
+  ).join('') || "<p>No trips booked yet.</p>";
+}
+render();
+</script>
+</body>
+</html>

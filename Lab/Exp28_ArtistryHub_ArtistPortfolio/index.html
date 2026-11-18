@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArtistryHub | Emily Harris Portfolio</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Georgia', serif; margin: 0; padding: 0; }
+  body { background: #faf5ff; color: #2e1065; }
+  header { background: #3b0764; color: #f3e8ff; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav a { color: #e9d5ff; text-decoration: none; margin-left: 1.2rem; font-family: sans-serif; font-size: 0.95rem; }
+  .hero { background: linear-gradient(135deg, #581c87, #7e22ce); color: #fff; text-align: center; padding: 3.5rem 1rem; }
+  .container { max-width: 1050px; margin: 2rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .art-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 16px rgba(88,28,135,0.08); }
+  .swatch { height: 170px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; font-weight: bold; }
+  .body { padding: 1.2rem; }
+  .btn { background: #6b21a8; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-family: sans-serif; }
+  input { padding: 0.55rem; border: 1px solid #d8b4fe; border-radius: 6px; font-family: sans-serif; }
+</style>
+</head>
+<body>
+<header>
+  <h2>ArtistryHub</h2>
+  <nav>
+    <a href="#gallery">Gallery</a>
+    <a href="#bio">Biography</a>
+    <a href="#exhibitions">Exhibitions & Store</a>
+  </nav>
+</header>
+<div class="hero">
+  <h1>Emily Harris</h1>
+  <p style="margin-top:0.6rem; opacity:0.9;">Contemporary Abstract & Botanical Oil Painter • Exhibition Archive 2020–2026</p>
+</div>
+<div class="container">
+  <h2 id="gallery" style="margin-bottom:1rem;">Selected Works</h2>
+  <div class="grid" id="artGrid"></div>
+
+  <div id="bio" style="background:#fff; padding:1.5rem; border-radius:12px; margin:2rem 0;">
+    <h2>About the Artist</h2>
+    <p style="margin-top:0.6rem; line-height:1.6; font-family:sans-serif;">Emily Harris explores chromatic light transitions across coastal landscapes. Featured in 14 solo exhibitions across London, Florence, and Mumbai, her archival giclée prints are held in private collections worldwide.</p>
+  </div>
+
+  <div id="exhibitions" style="background:#fff; padding:1.5rem; border-radius:12px;">
+    <h2>Upcoming Exhibitions & Newsletter</h2>
+    <p style="margin:0.5rem 0 1rem; font-family:sans-serif;">• <strong>Dec 12, 2026:</strong> "Chromatic Horizons" — Jehangir Art Gallery, Mumbai</p>
+    <input id="subEmail" placeholder="Enter your email for exhibition invites">
+    <button class="btn" onclick="subscribe()">Subscribe</button>
+    <p id="subMsg" style="margin-top:0.6rem; color:#6b21a8; font-family:sans-serif;"></p>
+  </div>
+</div>
+<script>
+const works = [
+  { title: "Solstice in Violet", year: 2025, medium: "Oil on Linen", price: 12000, grad: "linear-gradient(135deg,#4c1d95,#c084fc)" },
+  { title: "Monsoon Gold", year: 2026, medium: "Acrylic & Gold Leaf", price: 15500, grad: "linear-gradient(135deg,#b45309,#facc15)" },
+  { title: "Silent Tide", year: 2024, medium: "Watercolor Archival Print", price: 6500, grad: "linear-gradient(135deg,#0f766e,#38bdf8)" }
+];
+document.getElementById('artGrid').innerHTML = works.map(w => `
+  <div class="art-card">
+    <div class="swatch" style="background:${w.grad};">${w.title}</div>
+    <div class="body">
+      <h3>${w.title} (${w.year})</h3>
+      <p style="font-family:sans-serif; color:#6b7280; margin:0.4rem 0;">${w.medium}</p>
+      <p style="font-family:sans-serif; font-weight:bold; margin-bottom:0.8rem;">Signed Print: ₹${w.price}</p>
+      <button class="btn" onclick="alert('Added signed print of ${w.title} to inquiry cart!')">Acquire Print</button>
+    </div>
+  </div>
+`).join('');
+function subscribe() {
+  const e = document.getElementById('subEmail').value.trim();
+  if(e) document.getElementById('subMsg').innerText = "Subscribed " + e + " to Emily Harris studio updates!";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gourmet Haven | Fine Dining & Reservations</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Georgia', serif; margin: 0; padding: 0; }
+  body { background: #1c1917; color: #f5f5f4; }
+  header { background: #0c0a09; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #44403c; }
+  header h1 { color: #f59e0b; }
+  .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .tabs button { background: #292524; color: #e7e5e4; border: 1px solid #57534e; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-right: 0.4rem; font-family: sans-serif; }
+  .tabs button.active { background: #d97706; border-color: #d97706; color: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }
+  .card { background: #292524; padding: 1.3rem; border-radius: 10px; border: 1px solid #44403c; margin-bottom: 1.2rem; }
+  input, select { padding: 0.6rem; border-radius: 6px; border: 1px solid #57534e; background: #1c1917; color: #fff; margin-right: 0.4rem; margin-bottom: 0.5rem; font-family: sans-serif; }
+  .btn { background: #d97706; color: #fff; border: none; padding: 0.6rem 1.1rem; border-radius: 6px; cursor: pointer; font-family: sans-serif; font-weight: bold; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Gourmet Haven</h1>
+  <span style="font-family:sans-serif; color:#a8a29e;">Open Daily: 12:00 PM – 11:30 PM • ECR Promenade</span>
+</header>
+<div class="container">
+  <div class="card">
+    <h2>Curated Culinary Menu</h2>
+    <div class="tabs" style="margin-top:0.8rem;">
+      <button class="active" onclick="filterMenu('All', this)">All Courses</button>
+      <button onclick="filterMenu('Appetizers', this)">Appetizers</button>
+      <button onclick="filterMenu('Main Course', this)">Main Course</button>
+      <button onclick="filterMenu('Desserts', this)">Desserts</button>
+    </div>
+    <div class="grid" id="menuGrid"></div>
+  </div>
+
+  <div class="card">
+    <h2>Reserve a Dining Table</h2>
+    <div style="margin-top:0.8rem;">
+      <input id="gName" placeholder="Guest Name">
+      <input id="gDate" type="date">
+      <select id="gTime"><option>07:30 PM</option><option>08:30 PM</option><option>09:30 PM</option></select>
+      <input id="gSize" type="number" value="2" min="1" max="12" style="width:80px;">
+      <button class="btn" onclick="bookTable()">Confirm Reservation</button>
+    </div>
+    <p id="resConf" style="margin-top:0.8rem; color:#fbbf24; font-family:sans-serif;"></p>
+  </div>
+</div>
+<script>
+const dishes = [
+  { name: "Truffle Mushroom Crostini", cat: "Appetizers", desc: "Sourdough crisp, wild forest mushrooms, aged parmesan", price: 420 },
+  { name: "Smoked Herb Grilled Salmon", cat: "Main Course", desc: "Lemon butter emulsion, asparagus, saffron risotto", price: 980 },
+  { name: "Saffron Paneer Lababdar", cat: "Main Course", desc: "Chargrilled cottage cheese, cashew tomato velvet, garlic naan", price: 640 },
+  { name: "Dark Chocolate Hazelnut Tart", cat: "Desserts", desc: "70% single-origin ganache, roasted Piedmont hazelnuts", price: 380 }
+];
+function filterMenu(cat, btn) {
+  if(btn) {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  document.getElementById('menuGrid').innerHTML = dishes
+    .filter(d => cat === 'All' || d.cat === cat)
+    .map(d => `<div style="border-bottom:1px solid #44403c; padding-bottom:0.8rem;"><h3>${d.name} — <span style="color:#f59e0b;">₹${d.price}</span></h3><p style="font-family:sans-serif; color:#a8a29e; font-size:0.9rem; margin-top:0.3rem;">${d.desc}</p></div>`).join('');
+}
+function bookTable() {
+  const n = document.getElementById('gName').value.trim();
+  const d = document.getElementById('gDate').value || "Tonight";
+  const t = document.getElementById('gTime').value;
+  const s = document.getElementById('gSize').value;
+  if(!n) return alert("Enter guest name");
+  document.getElementById('resConf').innerText = `Table Confirmed for ${n} (${s} Guests) on ${d} at ${t}.`;
+}
+filterMenu('All');
+</script>
+</body>
+</html>

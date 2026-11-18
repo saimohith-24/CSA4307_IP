@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduConnect | Online Learning Platform</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #eef2ff; color: #1e1b4b; }
+  header { background: #3730a3; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #4338ca; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #818cf8; color: #1e1b4b; font-weight: bold; }
+  .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .btn { background: #4f46e5; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input { padding: 0.55rem; border: 1px solid #c7d2fe; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>EduConnect LMS</h1>
+  <nav>
+    <button class="active" onclick="tab('catalog', this)">Course Catalog</button>
+    <button onclick="tab('quiz', this)">Live Quiz</button>
+    <button onclick="tab('teacher', this)">Instructor Studio</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="catalog" class="view active">
+    <div class="grid" id="courseCards"></div>
+  </div>
+
+  <div id="quiz" class="view">
+    <div class="card">
+      <h2>Quick Self-Assessment: Web Technologies</h2>
+      <p style="margin:0.8rem 0;">1. Which HTML5 API enables persistent key-value storage in the browser without expiration?</p>
+      <select id="q1"><option value="0">sessionStorage</option><option value="1">localStorage</option><option value="0">cacheControl</option></select>
+      <button class="btn" onclick="gradeQuiz()">Submit Quiz</button>
+      <p id="quizScore" style="margin-top:0.8rem; font-weight:bold;"></p>
+    </div>
+  </div>
+
+  <div id="teacher" class="view">
+    <div class="card">
+      <h2>Create & Allocate New Course</h2>
+      <input id="cTitle" placeholder="Course Title">
+      <input id="cProf" placeholder="Instructor Name">
+      <input id="cHrs" placeholder="Duration (e.g., 24 Hours)">
+      <button class="btn" onclick="addCourse()">Publish Course</button>
+    </div>
+  </div>
+</div>
+<script>
+let courses = [
+  { title: "Compiler Design & Lexical Analysis", prof: "Dr. M. Selvam", hrs: "32 Hours", enrolled: false },
+  { title: "Full-Stack Web Engineering", prof: "Prof. K. Revathi", hrs: "40 Hours", enrolled: true },
+  { title: "Network Packet Auditing with Wireshark", prof: "Dr. R. Anand", hrs: "20 Hours", enrolled: false }
+];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function toggleEnroll(i) { courses[i].enrolled = !courses[i].enrolled; render(); }
+
+function gradeQuiz() {
+  const ok = document.getElementById('q1').value === "1";
+  document.getElementById('quizScore').innerText = ok ? "Score: 100% — Correct! localStorage persists across sessions." : "Incorrect. Try again!";
+}
+
+function addCourse() {
+  const title = document.getElementById('cTitle').value.trim();
+  const prof = document.getElementById('cProf').value.trim();
+  const hrs = document.getElementById('cHrs').value.trim() || "15 Hours";
+  if(!title || !prof) return;
+  courses.push({ title, prof, hrs, enrolled: false });
+  render();
+}
+
+function render() {
+  document.getElementById('courseCards').innerHTML = courses.map((c, i) => `
+    <div class="card">
+      <h3>${c.title}</h3>
+      <p style="margin:0.4rem 0; color:#4338ca;">Instructor: ${c.prof} • ${c.hrs}</p>
+      <button class="btn" onclick="toggleEnroll(${i})">${c.enrolled ? '✔ Enrolled (Download Notes)' : 'Enroll Now'}</button>
+    </div>
+  `).join('');
+}
+render();
+</script>
+</body>
+</html>

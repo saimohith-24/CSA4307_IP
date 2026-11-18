@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Finder | Real Estate Platform</title>
+<style>
+  :root { --primary: #2563eb; --dark: #0f172a; --bg: #f1f5f9; }
+  * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--dark); }
+  header { background: var(--dark); color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  header h1 span { color: #60a5fa; }
+  nav button { background: transparent; border: 1px solid #475569; color: #fff; padding: 0.45rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.5rem; }
+  nav button.active, nav button:hover { background: var(--primary); border-color: var(--primary); }
+  .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+  .search-bar { background: #fff; padding: 1.2rem; border-radius: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+  input, select { padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; }
+  .btn { background: var(--primary); color: #fff; border: none; padding: 0.65rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .btn-outline { background: #e2e8f0; color: var(--dark); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; }
+  .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+  .card-banner { height: 140px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: #fff; display: flex; align-items: flex-end; padding: 1rem; font-weight: bold; }
+  .card-body { padding: 1.2rem; flex: 1; }
+  .badge { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 0.2rem 0.6rem; border-radius: 99px; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .price { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin: 0.4rem 0; }
+  .section { display: none; } .section.active { display: block; }
+  .panel { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+  .map-box { background: #e2e8f0; border-radius: 10px; padding: 1.5rem; text-align: center; border: 2px dashed #94a3b8; margin-top: 1rem; }
+  .tag-list span { display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 0.4rem 0.8rem; border-radius: 6px; margin: 0.3rem; cursor: pointer; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Home<span>Finder</span></h1>
+  <nav>
+    <button class="active" onclick="showTab('browse', this)">Properties</button>
+    <button onclick="showTab('agents', this)">Agents & Map</button>
+    <button onclick="showTab('buyer', this)" id="authBtn">Buyer Login</button>
+  </nav>
+</header>
+
+<div class="container">
+  <!-- BROWSE TAB -->
+  <div id="browse" class="section active">
+    <div class="search-bar">
+      <input type="text" id="locInput" placeholder="City / Area (e.g., Chennai, Tirupati)">
+      <select id="typeInput">
+        <option value="">All Property Types</option>
+        <option value="Villa">Independent Villa</option>
+        <option value="Apartment">Apartment</option>
+        <option value="Plot">Residential Land/Plot</option>
+      </select>
+      <input type="number" id="maxPrice" placeholder="Max Budget (₹ Lakhs)">
+      <button class="btn" onclick="filterProps()">Search</button>
+      <button class="btn btn-outline" onclick="saveCriteria()">Save Criteria</button>
+    </div>
+
+    <div class="panel" id="savedBox" style="display:none;">
+      <strong>Saved Search Criteria (Click to apply):</strong>
+      <div class="tag-list" id="savedTags"></div>
+    </div>
+
+    <div class="grid" id="propGrid"></div>
+  </div>
+
+  <!-- AGENTS & MAP TAB -->
+  <div id="agents" class="section">
+    <div class="panel">
+      <h2>Verified Real Estate Agents & Companies</h2>
+      <p style="color:#64748b; margin-bottom:1rem;">Connect directly with RERA-certified agencies.</p>
+      <div class="grid">
+        <div class="card"><div class="card-body"><h3>Southern Estates Pvt Ltd</h3><p>Area: Chennai & OMR</p><p>Contact: +91 98400 11223</p></div></div>
+        <div class="card"><div class="card-body"><h3>Tirupati Prime Lands</h3><p>Area: Tirupati & Renigunta</p><p>Contact: +91 98400 44556</p></div></div>
+      </div>
+      <div class="map-box" id="mapPreview">
+        <h3>Interactive Google Maps Location Preview</h3>
+        <p id="mapCoords">Select "Locate on Map" on any property to pinpoint its neighborhood coordinates.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUYER PORTAL -->
+  <div id="buyer" class="section">
+    <div class="panel" style="max-width:450px; margin:auto;">
+      <h2 id="buyerTitle">Buyer Account Login</h2>
+      <p style="color:#64748b; margin-bottom:1rem;">Log in to save criteria and schedule site visits.</p>
+      <input type="text" id="buyerUser" placeholder="Buyer Username" style="margin-bottom:0.8rem;">
+      <input type="password" id="buyerPass" placeholder="Password" style="margin-bottom:0.8rem;">
+      <button class="btn" style="width:100%;" onclick="loginBuyer()">Sign In / Register</button>
+      <div id="visitHistory" style="margin-top:1.5rem;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const properties = [
+  { id: 1, title: "Greenwood 3BHK Villa", loc: "Chennai", type: "Villa", price: 85, agent: "Southern Estates", coords: "13.0827° N, 80.2707° E" },
+  { id: 2, title: "Skyline Lakeview Apt", loc: "Bangalore", type: "Apartment", price: 62, agent: "Metro Homes", coords: "12.9716° N, 77.5946° E" },
+  { id: 3, title: "Hillview DTCP Plot (2400 sq.ft)", loc: "Tirupati", type: "Plot", price: 38, agent: "Tirupati Prime Lands", coords: "13.6288° N, 79.4192° E" },
+  { id: 4, title: "Palm Meadows Duplex", loc: "Chennai", type: "Villa", price: 110, agent: "Southern Estates", coords: "12.9165° N, 80.2275° E" }
+];
+let currentUser = localStorage.getItem("hf_user") || "";
+let savedCriteria = JSON.parse(localStorage.getItem("hf_criteria") || "[]");
+let bookings = JSON.parse(localStorage.getItem("hf_bookings") || "[]");
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+function renderProps(list) {
+  const grid = document.getElementById('propGrid');
+  grid.innerHTML = list.map(p => `
+    <div class="card">
+      <div class="card-banner">${p.loc} • ${p.type}</div>
+      <div class="card-body">
+        <span class="badge">${p.agent}</span>
+        <h3>${p.title}</h3>
+        <div class="price">₹ ${p.price} Lakhs</div>
+        <p style="font-size:0.9rem; color:#475569; margin-bottom:1rem;">Coordinates: ${p.coords}</p>
+        <button class="btn" onclick="bookVisit('${p.title}')">Book Viewing</button>
+        <button class="btn btn-outline" onclick="locateMap('${p.title}', '${p.coords}')">Map</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterProps() {
+  const loc = document.getElementById('locInput').value.toLowerCase();
+  const type = document.getElementById('typeInput').value;
+  const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+  renderProps(properties.filter(p => p.loc.toLowerCase().includes(loc) && (!type || p.type === type) && p.price <= max));
+}
+
+function saveCriteria() {
+  const loc = document.getElementById('locInput').value || "Any";
+  const type = document.getElementById('typeInput').value || "All";
+  const max = document.getElementById('maxPrice').value || "Any";
+  savedCriteria.push({ loc, type, max });
+  localStorage.setItem("hf_criteria", JSON.stringify(savedCriteria));
+  renderCriteria();
+}
+
+function renderCriteria() {
+  const box = document.getElementById('savedBox');
+  if(!savedCriteria.length) return;
+  box.style.display = 'block';
+  document.getElementById('savedTags').innerHTML = savedCriteria.map((c, i) =>
+    `<span onclick="applyCriteria(${i})">${c.loc} | ${c.type} | ≤ ₹${c.max}L</span>`
+  ).join('');
+}
+
+function applyCriteria(i) {
+  const c = savedCriteria[i];
+  document.getElementById('locInput').value = c.loc === "Any" ? "" : c.loc;
+  document.getElementById('typeInput').value = c.type === "All" ? "" : c.type;
+  document.getElementById('maxPrice').value = c.max === "Any" ? "" : c.max;
+  filterProps();
+}
+
+function locateMap(title, coords) {
+  showTab('agents', document.querySelectorAll('nav button')[1]);
+  document.getElementById('mapCoords').innerHTML = `<strong>Pinned:</strong> ${title} at <code>${coords}</code>`;
+}
+
+function loginBuyer() {
+  const u = document.getElementById('buyerUser').value.trim();
+  if(!u) return alert("Enter username");
+  currentUser = u;
+  localStorage.setItem("hf_user", u);
+  updateUserUI();
+}
+
+function bookVisit(title) {
+  if(!currentUser) { alert("Please log in as a Buyer first."); return showTab('buyer', document.querySelectorAll('nav button')[2]); }
+  bookings.push({ user: currentUser, prop: title, date: new Date().toLocaleDateString() });
+  localStorage.setItem("hf_bookings", JSON.stringify(bookings));
+  alert("Site visit scheduled for " + title);
+  updateUserUI();
+}
+
+function updateUserUI() {
+  if(currentUser) {
+    document.getElementById('authBtn').innerText = "Hi, " + currentUser;
+    document.getElementById('buyerTitle').innerText = "Welcome, " + currentUser;
+    const myB = bookings.filter(b => b.user === currentUser);
+    document.getElementById('visitHistory').innerHTML = "<h4>Scheduled Site Visits:</h4>" + (myB.map(b => `<p>• ${b.prop} (${b.date})</p>`).join('') || "<p>No visits yet.</p>");
+  }
+}
+
+renderProps(properties);
+renderCriteria();
+updateUserUI();
+</script>
+</body>
+</html>

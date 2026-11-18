@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ko-Matha Dairy Farm | Pure A1 Cow Dairy</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #fefce8; color: #365314; }
+  header { background: #3f6212; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #4d7c0f; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #fde047; color: #1a2e05; font-weight: bold; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.2rem; }
+  .btn { background: #4d7c0f; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #d9f99d; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; }
+  th, td { padding: 0.65rem; border-bottom: 1px solid #ecfccb; text-align: left; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ko-Matha Dairy Farm</h1>
+  <nav>
+    <button class="active" onclick="tab('store', this)">Products & Order</button>
+    <button onclick="tab('farm', this)">Farm & Vendors</button>
+    <button onclick="tab('admin', this)">Admin Stock & Reports</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="store" class="view active">
+    <div class="grid" id="prodGrid"></div>
+    <div class="card" style="margin-top:1.2rem;">
+      <h3>Customer Online Purchase Orders</h3>
+      <div id="orderLog" style="margin-top:0.6rem;"></div>
+    </div>
+  </div>
+
+  <div id="farm" class="view">
+    <div class="card">
+      <h2>About Our A1 Indigenous Dairy Farm</h2>
+      <p style="margin-top:0.5rem; line-height:1.6;">Ko-Matha Dairy Farm sources hygienic, chemical-free A1 milk directly from vetted local cow holders, chilled within 30 minutes of milking and delivered fresh every morning.</p>
+    </div>
+    <div class="card">
+      <h3>Milk Vendor & Cattle Maintenance</h3>
+      <input id="vName" placeholder="Vendor Name">
+      <input id="vCows" type="number" placeholder="No. of A1 Cows">
+      <input id="vLitres" type="number" placeholder="Daily Yield (Liters)">
+      <button class="btn" onclick="addVendor()">Add Vendor</button>
+      <table><thead><tr><th>Vendor</th><th>A1 Cows</th><th>Daily Yield</th></tr></thead><tbody id="vendorRows"></tbody></table>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Stock Entry & Periodic Production Reports</h2>
+      <select id="repPeriod" onchange="render()">
+        <option value="1">Daily Report (Today)</option>
+        <option value="30">Monthly Projection (30 Days)</option>
+        <option value="365">Yearly Projection (365 Days)</option>
+      </select>
+      <div id="reportBox" style="margin-top:0.8rem; font-weight:bold;"></div>
+    </div>
+  </div>
+</div>
+<script>
+let products = [
+  { id: 1, name: "Farm Fresh A1 Cow Milk (1L)", price: 68, stock: 120 },
+  { id: 2, name: "Probiotic Pot Curd (500g)", price: 45, stock: 60 },
+  { id: 3, name: "Traditional Milk Cova Sweet (250g)", price: 140, stock: 35 },
+  { id: 4, name: "Pure Bilona Cow Ghee (500ml)", price: 420, stock: 25 }
+];
+let orders = [];
+let vendors = [
+  { name: "Subba Rao Dairy Holder", cows: 12, liters: 145 },
+  { name: "Lakshmi Narayana Farm", cows: 8, liters: 95 }
+];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function orderProd(id) {
+  const p = products.find(x => x.id === id);
+  if(p.stock <= 0) return alert("Out of stock");
+  const cust = prompt("Enter Customer Name & Delivery Slot (Morning/Evening):", "Ramesh - 6:30 AM");
+  if(!cust) return;
+  p.stock--;
+  orders.unshift({ item: p.name, price: p.price, cust });
+  render();
+}
+
+function addVendor() {
+  const name = document.getElementById('vName').value.trim();
+  const cows = parseInt(document.getElementById('vCows').value) || 1;
+  const liters = parseInt(document.getElementById('vLitres').value) || 10;
+  if(!name) return;
+  vendors.push({ name, cows, liters });
+  render();
+}
+
+function render() {
+  document.getElementById('prodGrid').innerHTML = products.map(p => `
+    <div class="card">
+      <h3>${p.name}</h3>
+      <p style="font-size:1.2rem; font-weight:bold; margin:0.5rem 0;">₹${p.price}</p>
+      <p style="font-size:0.85rem; margin-bottom:0.8rem;">In Stock: ${p.stock} units</p>
+      <button class="btn" onclick="orderProd(${p.id})">Order Online</button>
+    </div>
+  `).join('');
+
+  document.getElementById('orderLog').innerHTML = orders.map(o =>
+    `<p style="padding:0.4rem 0; border-bottom:1px solid #ecfccb;"><strong>${o.cust}</strong> ordered <b>${o.item}</b> — ₹${o.price}</p>`
+  ).join('') || "<p>No online orders yet.</p>";
+
+  document.getElementById('vendorRows').innerHTML = vendors.map(v =>
+    `<tr><td>${v.name}</td><td>${v.cows}</td><td>${v.liters} L/day</td></tr>`
+  ).join('');
+
+  const mult = parseInt(document.getElementById('repPeriod').value);
+  const dailyLiters = vendors.reduce((s, v) => s + v.liters, 0);
+  document.getElementById('reportBox').innerHTML = `
+    Total Milk Procured: ${dailyLiters * mult} Liters | Estimated Dairy Revenue: ₹${(dailyLiters * mult * 68).toLocaleString('en-IN')}
+  `;
+}
+render();
+</script>
+</body>
+</html>

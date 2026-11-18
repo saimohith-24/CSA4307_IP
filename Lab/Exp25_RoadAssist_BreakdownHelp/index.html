@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoadAssist | Emergency Mechanic Finder</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #fff7ed; color: #431407; }
+  header { background: #c2410c; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #9a3412; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #fb923c; color: #431407; font-weight: bold; }
+  .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .btn { background: #ea580c; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input { padding: 0.55rem; border: 1px solid #fed7aa; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>RoadAssist SOS</h1>
+  <nav>
+    <button class="active" onclick="tab('driver', this)">Find Mechanic</button>
+    <button onclick="tab('mech', this)">Mechanic Portal</button>
+    <button onclick="tab('admin', this)">Admin Approval</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="driver" class="view active">
+    <div class="card">
+      <input id="locSearch" placeholder="Search Highway / City (e.g., Renigunta, Poonamallee)" oninput="render()">
+    </div>
+    <div class="grid" id="mechGrid"></div>
+    <div class="card" id="sosLog" style="display:none; background:#fef3c7;"></div>
+  </div>
+
+  <div id="mech" class="view">
+    <div class="card">
+      <h2>Register Licensed Workshop</h2>
+      <input id="mShop" placeholder="Garage / Mechanic Name">
+      <input id="mArea" placeholder="Service Area / Highway">
+      <input id="mSpec" placeholder="Specialty (e.g., Engine & Towing)">
+      <input id="mPhone" placeholder="24x7 Helpline">
+      <button class="btn" onclick="regMech()">Submit for Approval</button>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Admin: License Verification & Approvals</h2>
+      <div id="adminMechList"></div>
+    </div>
+  </div>
+</div>
+<script>
+let mechanics = [
+  { id: 1, shop: "Sri Balaji Highway Auto Care", area: "Renigunta - Tirupati NH", spec: "Battery, Tyre & Engine", phone: "98490 22110", geo: "13.6355° N, 79.5083° E", approved: true },
+  { id: 2, shop: "Poonamallee 24x7 Breakdown Crew", area: "Poonamallee Bypass, Chennai", spec: "Flatbed Towing & Electrical", phone: "98400 77889", geo: "13.0473° N, 80.0945° E", approved: true },
+  { id: 3, shop: "QuickFix Mobile Mechanics", area: "Vellore Highway", spec: "Puncture & Jumpstart", phone: "97900 33445", geo: "12.9165° N, 79.1325° E", approved: false }
+];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function requestHelp(shop, phone, geo) {
+  const box = document.getElementById('sosLog');
+  box.style.display = 'block';
+  box.innerHTML = `<strong>SOS Dispatched!</strong> ${shop} (${phone}) has received your GPS pin near <code>${geo}</code>. ETA: 18 mins.`;
+}
+
+function regMech() {
+  const shop = document.getElementById('mShop').value.trim();
+  const area = document.getElementById('mArea').value.trim();
+  const spec = document.getElementById('mSpec').value.trim();
+  const phone = document.getElementById('mPhone').value.trim();
+  if(!shop || !area) return;
+  mechanics.push({ id: Date.now(), shop, area, spec, phone, geo: "13.08° N, 80.27° E", approved: false });
+  alert("Workshop submitted for Admin license approval.");
+  render();
+}
+
+function toggleApprove(i) { mechanics[i].approved = !mechanics[i].approved; render(); }
+
+function render() {
+  const q = document.getElementById('locSearch').value.toLowerCase();
+  document.getElementById('mechGrid').innerHTML = mechanics
+    .filter(m => m.approved && (m.area.toLowerCase().includes(q) || m.shop.toLowerCase().includes(q)))
+    .map(m => `
+      <div class="card">
+        <h3>${m.shop}</h3>
+        <p style="margin:0.4rem 0;"><strong>Area:</strong> ${m.area}</p>
+        <p style="margin:0.4rem 0;"><strong>Services:</strong> ${m.spec}</p>
+        <p style="font-size:0.85rem; color:#7c2d12; margin-bottom:0.8rem;">Geo: ${m.geo}</p>
+        <button class="btn" onclick="requestHelp('${m.shop}', '${m.phone}', '${m.geo}')">Dispatch Mechanic</button>
+      </div>
+    `).join('');
+
+  document.getElementById('adminMechList').innerHTML = mechanics.map((m, i) =>
+    `<p style="padding:0.5rem 0; border-bottom:1px solid #ffedd5;"><strong>${m.shop}</strong> (${m.area}) — <b>${m.approved ? 'Licensed' : 'Pending'}</b> <button class="btn" onclick="toggleApprove(${i})">${m.approved ? 'Suspend' : 'Approve'}</button></p>`
+  ).join('');
+}
+render();
+</script>
+</body>
+</html>

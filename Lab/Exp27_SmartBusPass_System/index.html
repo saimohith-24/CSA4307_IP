@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartBusPass | QR Commuter Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #eff6ff; color: #1e3a8a; }
+  header { background: #1d4ed8; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #1e40af; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #60a5fa; color: #172554; font-weight: bold; }
+  .container { max-width: 980px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.4rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .btn { background: #2563eb; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #bfdbfe; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .pass-card { border: 2px dashed #2563eb; padding: 1rem; border-radius: 10px; background: #f8fafc; margin-top: 0.8rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SmartBusPass</h1>
+  <nav>
+    <button class="active" onclick="tab('user', this)">Passenger Portal</button>
+    <button onclick="tab('conductor', this)">Conductor Scanner</button>
+    <button onclick="tab('admin', this)">Admin Depot</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="user" class="view active">
+    <div class="card">
+      <h2>Apply / Renew Monthly Bus Pass (eWallet: ₹<span id="wal">600</span>)</h2>
+      <input id="uName" placeholder="Candidate Name">
+      <select id="uType"><option value="0">Govt School Student (Free - ₹0)</option><option value="350">General Route Pass (₹350/mo)</option></select>
+      <input id="uOrg" placeholder="School / Organization Name">
+      <input id="uRoute" placeholder="Route (e.g., Poonamallee - Broadway)">
+      <button class="btn" onclick="applyBusPass()">Apply Pass</button>
+      <div id="myPasses"></div>
+    </div>
+  </div>
+
+  <div id="conductor" class="view">
+    <div class="card">
+      <h2>Conductor QR / Pass ID Check</h2>
+      <input id="qrCodeInput" placeholder="Enter Pass ID (e.g., BUS-501)">
+      <button class="btn" onclick="checkPass()">Verify Pass</button>
+      <p id="verifyMsg" style="margin-top:1rem; font-weight:bold;"></p>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Depot Admin: Approve Bus Passes</h2>
+      <div id="adminQueue"></div>
+    </div>
+  </div>
+</div>
+<script>
+let wallet = 600;
+let passes = [{ id: "BUS-501", name: "Y. Sai Mohith", org: "SIMATS", route: "Poonamallee - Chennai", fee: 350, status: "Approved" }];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function applyBusPass() {
+  const name = document.getElementById('uName').value.trim();
+  const fee = parseInt(document.getElementById('uType').value);
+  const org = document.getElementById('uOrg').value.trim();
+  const route = document.getElementById('uRoute').value.trim();
+  if(!name || !route) return;
+  if(wallet < fee) return alert("Insufficient eWallet balance");
+  wallet -= fee;
+  passes.unshift({ id: "BUS-" + (501 + passes.length), name, org, route, fee, status: "Pending Approval" });
+  render();
+}
+
+function approve(i) { passes[i].status = "Approved"; render(); }
+
+function checkPass() {
+  const pid = document.getElementById('qrCodeInput').value.trim().toUpperCase();
+  const p = passes.find(x => x.id === pid);
+  const msg = document.getElementById('verifyMsg');
+  if(p && p.status === "Approved") {
+    msg.style.color = "green";
+    msg.innerText = `VALID PASS: ${p.name} (${p.org}) | Route: ${p.route}`;
+  } else {
+    msg.style.color = "red";
+    msg.innerText = "INVALID OR PENDING PASS ID";
+  }
+}
+
+function render() {
+  document.getElementById('wal').innerText = wallet;
+  document.getElementById('myPasses').innerHTML = passes.map(p => `
+    <div class="pass-card">
+      <strong>QR ID: ${p.id}</strong> | ${p.name} (${p.org})<br>
+      Route: ${p.route} | Fee Paid: ₹${p.fee} | Status: <b>${p.status}</b>
+    </div>
+  `).join('');
+  document.getElementById('adminQueue').innerHTML = passes.map((p, i) =>
+    `<p style="padding:0.5rem 0;">${p.id} — ${p.name} (${p.route}) — <b>${p.status}</b> ${p.status !== 'Approved' ? `<button class="btn" onclick="approve(${i})">Generate QR & Approve</button>` : ''}</p>`
+  ).join('');
+}
+render();
+</script>
+</body>
+</html>

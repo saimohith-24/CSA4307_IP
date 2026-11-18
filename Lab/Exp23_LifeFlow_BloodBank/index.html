@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeFlow | Blood Bank & Donor Registry</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #fef2f2; color: #450a0a; }
+  header { background: #991b1b; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #7f1d1d; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #ef4444; font-weight: bold; }
+  .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(153,27,27,0.07); margin-bottom: 1.2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .btn { background: #dc2626; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #fecaca; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .bg-pill { display: inline-block; background: #fee2e2; color: #b91c1c; font-weight: 800; padding: 0.3rem 0.7rem; border-radius: 8px; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>LifeFlow Blood Bank</h1>
+  <nav>
+    <button class="active" onclick="tab('search', this)">Find Blood & Donors</button>
+    <button onclick="tab('donor', this)">Donor Registration</button>
+    <button onclick="tab('hospital', this)">Hospital Stock</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="search" class="view active">
+    <div class="card">
+      <select id="bgFilter" onchange="render()">
+        <option value="">All Blood Groups</option><option>O+</option><option>O-</option><option>A+</option><option>B+</option><option>AB+</option>
+      </select>
+      <input id="cityFilter" placeholder="Filter by City..." oninput="render()">
+    </div>
+    <div class="card">
+      <h3>Hospital Blood Bank Inventory</h3>
+      <div class="grid" id="bankGrid" style="margin-top:0.8rem;"></div>
+    </div>
+    <div class="card">
+      <h3>Verified Voluntary Donors</h3>
+      <div id="donorList" style="margin-top:0.8rem;"></div>
+    </div>
+  </div>
+
+  <div id="donor" class="view">
+    <div class="card">
+      <h2>Register as a Blood Donor</h2>
+      <input id="dName" placeholder="Full Name">
+      <select id="dBg"><option>O+</option><option>O-</option><option>A+</option><option>B+</option><option>AB+</option></select>
+      <input id="dCity" placeholder="City">
+      <input id="dPhone" placeholder="Contact Number">
+      <button class="btn" onclick="addDonor()">Register Donor</button>
+    </div>
+  </div>
+
+  <div id="hospital" class="view">
+    <div class="card">
+      <h2>Hospital: Update Blood Group Stock</h2>
+      <select id="hBg"><option>O+</option><option>O-</option><option>A+</option><option>B+</option><option>AB+</option></select>
+      <input id="hUnits" type="number" placeholder="Available Units">
+      <button class="btn" onclick="updateStock()">Update Inventory</button>
+    </div>
+  </div>
+</div>
+<script>
+let stock = [
+  { bank: "SVIMS Central Blood Bank", city: "Tirupati", bg: "O+", units: 18 },
+  { bank: "Apollo Red Cross Wing", city: "Chennai", bg: "O-", units: 6 },
+  { bank: "City General Hospital", city: "Tirupati", bg: "B+", units: 14 },
+  { bank: "Care Life Blood Center", city: "Chennai", bg: "A+", units: 11 }
+];
+let donors = [
+  { name: "Karthik Reddy", bg: "O+", city: "Tirupati", phone: "98480 12345" },
+  { name: "Divya Menon", bg: "O-", city: "Chennai", phone: "98401 67890" }
+];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function addDonor() {
+  const name = document.getElementById('dName').value.trim();
+  const bg = document.getElementById('dBg').value;
+  const city = document.getElementById('dCity').value.trim();
+  const phone = document.getElementById('dPhone').value.trim();
+  if(!name || !city) return;
+  donors.unshift({ name, bg, city, phone });
+  alert("Thank you for registering as a donor!");
+  render();
+}
+
+function updateStock() {
+  const bg = document.getElementById('hBg').value;
+  const units = parseInt(document.getElementById('hUnits').value);
+  if(isNaN(units)) return;
+  const item = stock.find(s => s.bg === bg);
+  if(item) item.units = units;
+  else stock.push({ bank: "Metro Hospital Bank", city: "Chennai", bg, units });
+  alert("Updated " + bg + " stock to " + units + " units.");
+  render();
+}
+
+function render() {
+  const bg = document.getElementById('bgFilter').value;
+  const city = document.getElementById('cityFilter').value.toLowerCase();
+  document.getElementById('bankGrid').innerHTML = stock
+    .filter(s => (!bg || s.bg === bg) && s.city.toLowerCase().includes(city))
+    .map(s => `<div style="border:1px solid #fecaca; padding:1rem; border-radius:10px;"><span class="bg-pill">${s.bg}</span><h4 style="margin:0.5rem 0;">${s.bank}</h4><p>${s.city} • <b>${s.units} Units</b></p></div>`).join('');
+
+  document.getElementById('donorList').innerHTML = donors
+    .filter(d => (!bg || d.bg === bg) && d.city.toLowerCase().includes(city))
+    .map(d => `<p style="padding:0.5rem 0; border-bottom:1px solid #fee2e2;"><span class="bg-pill">${d.bg}</span> <strong>${d.name}</strong> (${d.city}) — 📞 ${d.phone}</p>`).join('');
+}
+render();
+</script>
+</body>
+</html>

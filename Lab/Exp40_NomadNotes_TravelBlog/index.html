@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NomadNotes | Travel Stories & Guides</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f0fdfa; color: #134e4a; }
+  header { background: #0f766e; color: #fff; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+  .map-bar { background: #ccfbf1; padding: 1.2rem; border-radius: 12px; margin-bottom: 1.5rem; }
+  .pin { background: #0d9488; color: #fff; border: none; padding: 0.45rem 0.9rem; border-radius: 99px; cursor: pointer; margin: 0.3rem; font-weight: 600; }
+  .card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+  input { padding: 0.55rem; border: 1px solid #99f6e4; border-radius: 6px; width: 70%; }
+  .btn { background: #0f766e; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NomadNotes</h1>
+  <span>Field Notes, Maps & Packing Guides</span>
+</header>
+<div class="container">
+  <div class="map-bar">
+    <strong>Interactive Destination Map Pins (Click a location to filter stories):</strong><br>
+    <button class="pin" onclick="filterPosts('All')">📍 All Destinations</button>
+    <button class="pin" onclick="filterPosts('Spiti Valley')">📍 Spiti Valley</button>
+    <button class="pin" onclick="filterPosts('Gokarna Coast')">📍 Gokarna Coast</button>
+    <button class="pin" onclick="filterPosts('Meghalaya')">📍 Meghalaya</button>
+  </div>
+
+  <div id="postsFeed"></div>
+
+  <div class="card">
+    <h3>Traveler's Essential Packing Checklist</h3>
+    <p style="margin-top:0.5rem;">✔ Universal Type-C GaN Charger • ✔ Offline Maps Downloaded • ✔ Microfiber Quick-Dry Towel • ✔ First-Aid & Electrolytes</p>
+  </div>
+</div>
+<script>
+let posts = [
+  { id: 1, loc: "Spiti Valley", title: "Crossing Kunzum Pass at 15,000 Feet", body: "High-altitude monasteries, crisp Himalayan air, and homestay butter tea along the Spiti circuit.", comments: ["Incredible route tips!"] },
+  { id: 2, loc: "Gokarna Coast", title: "Cliffside Trails from Kudle to Paradise Beach", body: "Tracing the red-laterite coastal ridge at sunrise with fresh coastal seafood shacks along the bay.", comments: [] },
+  { id: 3, loc: "Meghalaya", title: "Living Root Bridges of Nongriat", body: "Descending 3,500 stone steps into lush rainforest valleys to witness bio-engineered Ficus bridges.", comments: ["Added to my bucket list!"] }
+];
+
+function filterPosts(loc) {
+  const list = loc === 'All' ? posts : posts.filter(p => p.loc === loc);
+  document.getElementById('postsFeed').innerHTML = list.map((p, idx) => `
+    <div class="card">
+      <small style="color:#0d9488; font-weight:bold;">📍 ${p.loc}</small>
+      <h2 style="margin:0.4rem 0;">${p.title}</h2>
+      <p style="line-height:1.6; margin-bottom:1rem;">${p.body}</p>
+      <div style="background:#f0fdfa; padding:0.8rem; border-radius:8px;">
+        <strong>Reader Discussion (${p.comments.length}):</strong>
+        ${p.comments.map(c => `<p style="margin:0.3rem 0;">• ${c}</p>`).join('')}
+        <div style="margin-top:0.5rem;">
+          <input id="cmt-${p.id}" placeholder="Write a comment...">
+          <button class="btn" onclick="addComment(${p.id})">Post</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addComment(id) {
+  const inp = document.getElementById('cmt-' + id);
+  if(!inp.value.trim()) return;
+  posts.find(p => p.id === id).comments.push(inp.value.trim());
+  filterPosts('All');
+}
+filterPosts('All');
+</script>
+</body>
+</html>

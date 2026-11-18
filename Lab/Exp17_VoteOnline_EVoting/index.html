@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteOnline | Digital Election Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #eef2ff; color: #1e1b4b; }
+  header { background: #312e81; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  .container { max-width: 850px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 14px rgba(49,46,129,0.08); margin-bottom: 1.5rem; }
+  input { padding: 0.6rem; border: 1px solid #c7d2fe; border-radius: 6px; width: 100%; margin-bottom: 0.8rem; }
+  .btn { background: #4338ca; color: #fff; border: none; padding: 0.6rem 1.1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .cand-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #e0e7ff; padding: 1rem; border-radius: 8px; margin-bottom: 0.7rem; }
+  .bar-bg { background: #e0e7ff; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 0.4rem; }
+  .bar-fill { background: #4f46e5; height: 100%; transition: width 0.3s; }
+</style>
+</head>
+<body>
+<header>
+  <h1>VoteOnline</h1>
+  <button class="btn" style="background:#1e1b4b;" onclick="toggleAdmin()">Admin Results & Candidates</button>
+</header>
+<div class="container">
+  <div class="card" id="authStep">
+    <h2>Voter Authentication</h2>
+    <p style="color:#4338ca; margin-bottom:1rem; font-size:0.9rem;">Demo Voter IDs: <b>VOT101</b>, <b>VOT102</b>, <b>VOT103</b> (or enter any new ID)</p>
+    <input id="voterId" placeholder="Enter Voter ID (e.g., VOT101)">
+    <button class="btn" onclick="sendOTP()">Generate OTP</button>
+    <div id="otpBox" style="display:none; margin-top:1rem;">
+      <p id="otpHint" style="color:#059669; font-weight:bold; margin-bottom:0.5rem;"></p>
+      <input id="otpInput" placeholder="Enter 4-digit OTP">
+      <button class="btn" onclick="verifyVoter()">Verify & Open Ballot</button>
+    </div>
+  </div>
+
+  <div class="card" id="ballotBox" style="display:none;">
+    <h2>Official Electronic Ballot — Student Council 2026</h2>
+    <p style="margin-bottom:1rem; color:#4b5563;">Logged in Voter: <strong id="activeVoter"></strong></p>
+    <div id="candList"></div>
+  </div>
+
+  <div class="card" id="adminBox" style="display:none;">
+    <h2>Live Election Results & Candidate Setup</h2>
+    <div style="display:flex; gap:0.5rem; margin:1rem 0;">
+      <input id="newCand" placeholder="Candidate Name" style="margin:0;">
+      <input id="newParty" placeholder="Party / Symbol" style="margin:0;">
+      <button class="btn" onclick="addCandidate()">Add</button>
+    </div>
+    <div id="resultsView"></div>
+  </div>
+</div>
+<script>
+let candidates = [
+  { id: 1, name: "Ananya Verma", party: "Progressive Innovators", votes: 14 },
+  { id: 2, name: "Rohan Kulkarni", party: "United Campus Alliance", votes: 11 },
+  { id: 3, name: "Meera Nair", party: "Green Future Forum", votes: 9 }
+];
+let votedIds = new Set();
+let generatedOTP = "";
+let currentVoter = "";
+
+function sendOTP() {
+  const vid = document.getElementById('voterId').value.trim().toUpperCase();
+  if(!vid) return alert("Enter Voter ID");
+  if(votedIds.has(vid)) return alert("This Voter ID has already cast its vote!");
+  currentVoter = vid;
+  generatedOTP = String(Math.floor(1000 + Math.random()*9000));
+  document.getElementById('otpBox').style.display = 'block';
+  document.getElementById('otpHint').innerText = `Simulated SMS OTP: ${generatedOTP}`;
+}
+
+function verifyVoter() {
+  if(document.getElementById('otpInput').value.trim() !== generatedOTP) return alert("Invalid OTP");
+  document.getElementById('authStep').style.display = 'none';
+  document.getElementById('ballotBox').style.display = 'block';
+  document.getElementById('activeVoter').innerText = currentVoter;
+  renderBallot();
+}
+
+function renderBallot() {
+  document.getElementById('candList').innerHTML = candidates.map(c => `
+    <div class="cand-row">
+      <div><strong>${c.name}</strong><br><small>${c.party}</small></div>
+      <button class="btn" onclick="castVote(${c.id})">Vote</button>
+    </div>
+  `).join('');
+}
+
+function castVote(id) {
+  candidates.find(c => c.id === id).votes++;
+  votedIds.add(currentVoter);
+  alert(`Vote recorded securely for Voter ${currentVoter}!`);
+  document.getElementById('ballotBox').style.display = 'none';
+  document.getElementById('authStep').style.display = 'block';
+  document.getElementById('otpBox').style.display = 'none';
+  document.getElementById('voterId').value = "";
+  renderResults();
+}
+
+function toggleAdmin() {
+  const b = document.getElementById('adminBox');
+  b.style.display = b.style.display === 'none' ? 'block' : 'none';
+  renderResults();
+}
+
+function addCandidate() {
+  const name = document.getElementById('newCand').value.trim();
+  const party = document.getElementById('newParty').value.trim() || "Independent";
+  if(!name) return;
+  candidates.push({ id: Date.now(), name, party, votes: 0 });
+  renderResults();
+}
+
+function renderResults() {
+  const total = candidates.reduce((s, c) => s + c.votes, 0) || 1;
+  document.getElementById('resultsView').innerHTML = candidates.map(c => {
+    const pct = Math.round((c.votes / total) * 100);
+    return `<div style="margin-bottom:0.8rem;"><strong>${c.name} (${c.party})</strong> — ${c.votes} votes (${pct}%)<div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></div>`;
+  }).join('');
+}
+renderResults();
+</script>
+</body>
+</html>

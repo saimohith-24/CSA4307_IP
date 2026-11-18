@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyProfessionalShowcase | Portfolio</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #0f172a; color: #f8fafc; }
+  header { background: #1e293b; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+  nav a { color: #94a3b8; text-decoration: none; margin-left: 1.2rem; font-weight: 600; }
+  nav a:hover { color: #38bdf8; }
+  .hero { max-width: 1000px; margin: 2.5rem auto; padding: 0 1rem; }
+  .hero h1 { font-size: 2.3rem; margin-bottom: 0.6rem; }
+  .hero span { color: #38bdf8; }
+  .section { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; margin-top: 1rem; }
+  .card { background: #1e293b; border: 1px solid #334155; padding: 1.4rem; border-radius: 12px; }
+  .pill { display: inline-block; background: #38bdf822; color: #38bdf8; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.8rem; margin-right: 0.3rem; }
+  .btn { background: #38bdf8; color: #0f172a; border: none; padding: 0.6rem 1.1rem; border-radius: 6px; cursor: pointer; font-weight: 700; }
+  input, textarea { width: 100%; background: #0f172a; color: #fff; border: 1px solid #475569; padding: 0.6rem; border-radius: 6px; margin-bottom: 0.7rem; }
+</style>
+</head>
+<body>
+<header>
+  <h3>DevShowcase</h3>
+  <nav>
+    <a href="#projects">Projects</a>
+    <a href="#resume">Resume Timeline</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <h1>Hi, I'm <span>Alex Carter</span> — Full-Stack & AI Engineer</h1>
+  <p style="color:#cbd5e1; max-width:650px; line-height:1.6; margin-bottom:1.2rem;">Building resilient web applications, compiler tooling, and data-driven dashboards with Python, JavaScript, and modern cloud architectures.</p>
+  <button class="btn" onclick="window.print()">Download / Print Resume</button>
+</div>
+
+<div class="section" id="projects">
+  <h2>Featured Engineering Projects</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Hybrid E-Commerce Recommender</h3>
+      <p style="color:#94a3b8; margin:0.6rem 0;">Collaborative filtering engine built with Flask, Pandas, and responsive JS storefront.</p>
+      <span class="pill">Python</span><span class="pill">Flask</span><span class="pill">JS</span>
+    </div>
+    <div class="card">
+      <h3>Campus Packet Audit Visualizer</h3>
+      <p style="color:#94a3b8; margin:0.6rem 0;">Real-time TCP/DNS anomaly dashboard analyzing Wireshark capture exports.</p>
+      <span class="pill">Networking</span><span class="pill">RStudio</span><span class="pill">HTML5</span>
+    </div>
+    <div class="card">
+      <h3>Mini-C Lexical & Predictive Parser</h3>
+      <p style="color:#94a3b8; margin:0.6rem 0;">LL(1) parsing table generator and syntax tree visualizer built using Flex/Lex.</p>
+      <span class="pill">Compiler Design</span><span class="pill">C / Lex</span>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="resume">
+  <h2>Career & Education Milestones</h2>
+  <div class="card" style="margin-top:1rem;">
+    <p style="margin-bottom:0.6rem;"><strong>2026 — Data Science Virtual Intern, NetworkGeek:</strong> Built predictive analytics pipelines in Python.</p>
+    <p><strong>2025 — AI Project Trainee, Corizo Edutech:</strong> Developed supervised ML classification models and interactive web demos.</p>
+  </div>
+</div>
+
+<div class="section" id="contact">
+  <h2>Get In Touch</h2>
+  <div class="card" style="margin-top:1rem;">
+    <input id="cName" placeholder="Your Name">
+    <input id="cEmail" placeholder="Email Address">
+    <textarea id="cMsg" rows="3" placeholder="Project or hiring inquiry..."></textarea>
+    <button class="btn" onclick="sendInquiry()">Send Message</button>
+    <p id="sentNote" style="margin-top:0.6rem; color:#4ade80;"></p>
+  </div>
+</div>
+<script>
+function sendInquiry() {
+  const n = document.getElementById('cName').value.trim();
+  if(n) document.getElementById('sentNote').innerText = `Thanks ${n}! Your message has been received.`;
+}
+</script>
+</body>
+</html>

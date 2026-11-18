@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IJSSE | Scopus-Indexed Academic Journal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f8fafc; color: #1e293b; }
+  header { background: #1e3a8a; color: #fff; padding: 1.2rem 2rem; }
+  header small { color: #93c5fd; display: block; margin-top: 0.3rem; }
+  nav { background: #172554; padding: 0.6rem 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  nav button { background: transparent; color: #e2e8f0; border: 1px solid #3b82f6; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; }
+  nav button.active { background: #2563eb; color: #fff; }
+  .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.4rem; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); margin-bottom: 1.2rem; }
+  input, select, textarea { width: 100%; padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 0.6rem; }
+  .btn { background: #1d4ed8; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>International Journal of Scientific and Social Excellence (IJSSE)</h1>
+  <small>Print ISSN: 2395-1443 | Online ISSN: 2395-1451 | Peer-Reviewed Open Access Publisher</small>
+</header>
+<nav>
+  <button class="active" onclick="tab('articles', this)">Current Issue & Archive</button>
+  <button onclick="tab('author', this)">For Authors (Submit Paper)</button>
+  <button onclick="tab('editor', this)">Editorial & Reviewer Desk</button>
+  <button onclick="tab('ethics', this)">About & Publication Ethics</button>
+</nav>
+<div class="container">
+  <div id="articles" class="view active">
+    <div class="card">
+      <h2>Volume 12, Issue 4 — Published Articles</h2>
+      <div id="pubList" style="margin-top:0.8rem;"></div>
+    </div>
+  </div>
+
+  <div id="author" class="view">
+    <div class="card">
+      <h2>Submit Manuscript (Call for Papers)</h2>
+      <input id="aTitle" placeholder="Manuscript Title">
+      <input id="aNames" placeholder="Author Name(s) & Affiliation">
+      <select id="aDomain"><option>Computer Science & AI</option><option>Network Security</option><option>Data Mining</option></select>
+      <textarea id="aAbs" rows="3" placeholder="Abstract..."></textarea>
+      <button class="btn" onclick="submitPaper()">Submit Manuscript</button>
+    </div>
+    <div class="card">
+      <h3>Track Submitted Manuscripts</h3>
+      <div id="subTracker"></div>
+    </div>
+  </div>
+
+  <div id="editor" class="view">
+    <div class="card">
+      <h2>Editorial Board & Peer Review Queue</h2>
+      <div id="reviewQueue"></div>
+    </div>
+  </div>
+
+  <div id="ethics" class="view">
+    <div class="card">
+      <h2>About Journal & Publication Ethics</h2>
+      <p style="margin-top:0.5rem; line-height:1.6;">IJSSE adheres strictly to COPE double-blind peer-review standards. All accepted articles receive DOI assignment and open-access indexing.</p>
+      <p style="margin-top:0.6rem;"><strong>Editor-in-Chief:</strong> Prof. Dr. K. Venkatesan | <strong>Contact:</strong> editor@ijsse-journal.org</p>
+    </div>
+  </div>
+</div>
+<script>
+let papers = [
+  { id: "IJSSE-401", title: "Hybrid Predictive Parsing for Domain-Specific Compilers", authors: "Y. Sai Mohith, Dr. S. Priya", domain: "Computer Science & AI", status: "Published" },
+  { id: "IJSSE-402", title: "Anomaly Detection in Campus Packet Captures Using Wireshark & R", authors: "R. Anitha", domain: "Network Security", status: "Under Peer Review" }
+];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function submitPaper() {
+  const title = document.getElementById('aTitle').value.trim();
+  const authors = document.getElementById('aNames').value.trim();
+  const domain = document.getElementById('aDomain').value;
+  if(!title || !authors) return alert("Enter title and authors");
+  papers.unshift({ id: "IJSSE-" + (401 + papers.length), title, authors, domain, status: "Under Peer Review" });
+  alert("Manuscript submitted! Tracking ID generated.");
+  render();
+}
+
+function acceptPaper(i) { papers[i].status = "Published"; render(); }
+
+function render() {
+  document.getElementById('pubList').innerHTML = papers
+    .filter(p => p.status === "Published")
+    .map(p => `<div style="border-bottom:1px solid #e2e8f0; padding:0.8rem 0;"><strong>${p.title}</strong><br><small>Authors: ${p.authors} | Domain: ${p.domain} | ID: ${p.id}</small></div>`).join('');
+
+  document.getElementById('subTracker').innerHTML = papers.map(p =>
+    `<p style="padding:0.4rem 0;"><strong>${p.id}</strong>: ${p.title} — Status: <b>${p.status}</b></p>`
+  ).join('');
+
+  document.getElementById('reviewQueue').innerHTML = papers.map((p, i) =>
+    `<div style="padding:0.6rem 0; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+      <span><strong>${p.id}:</strong> ${p.title} (${p.status})</span>
+      ${p.status !== 'Published' ? `<button class="btn" onclick="acceptPaper(${i})">Approve & Publish</button>` : '<span>✔ Published</span>'}
+    </div>`
+  ).join('');
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ram Infotech | Laptop Sales & Service</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f1f5f9; color: #0f172a; }
+  header { background: #0f172a; color: #38bdf8; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #1e293b; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #0284c7; font-weight: bold; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .btn { background: #0284c7; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ram Infotech</h1>
+  <nav>
+    <button class="active" onclick="tab('store', this)">Laptop Store & Rental</button>
+    <button onclick="tab('service', this)">Service Center</button>
+    <button onclick="tab('admin', this)">Admin Inventory</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="store" class="view active">
+    <div class="grid" id="lapGrid"></div>
+  </div>
+
+  <div id="service" class="view">
+    <div class="card">
+      <h2>Schedule Laptop Repair / Diagnostics</h2>
+      <input id="sCust" placeholder="Customer Name">
+      <input id="sModel" placeholder="Laptop Model (e.g., Acer Aspire 3)">
+      <select id="sIssue"><option>Screen / Hinge Replacement</option><option>Battery & Charging Port</option><option>SSD Upgrade & OS Install</option></select>
+      <button class="btn" onclick="bookService()">Book Service Ticket</button>
+    </div>
+    <div class="card">
+      <h3>Active Service Tickets</h3>
+      <div id="ticketList"></div>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Admin: Add Laptop Stock</h2>
+      <input id="lName" placeholder="Model Name">
+      <input id="lSpec" placeholder="Specs (CPU / RAM / SSD)">
+      <input id="lPrice" type="number" placeholder="Sale Price (₹)">
+      <input id="lRent" type="number" placeholder="Monthly Rent (₹)">
+      <button class="btn" onclick="addLaptop()">Add to Shop</button>
+    </div>
+  </div>
+</div>
+<script>
+let laptops = [
+  { id: 1, name: "Apple MacBook Air M4", spec: "16GB Unified / 512GB SSD", price: 114900, rent: 4500, stock: 5 },
+  { id: 2, name: "Acer Aspire 3 Ryzen 7", spec: "16GB RAM / 512GB NVMe", price: 46500, rent: 1800, stock: 8 },
+  { id: 3, name: "Lenovo ThinkPad E14", spec: "Core i7 / 16GB / 1TB SSD", price: 68000, rent: 2500, stock: 4 }
+];
+let tickets = [{ id: "SRV-101", cust: "Suresh K", model: "Dell Inspiron 15", issue: "Battery Replacement", status: "Ready for Pickup" }];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function buyLap(id, mode) {
+  const l = laptops.find(x => x.id === id);
+  if(l.stock <= 0) return alert("Out of stock");
+  l.stock--;
+  alert(mode === 'buy' ? `Purchased ${l.name} for ₹${l.price}` : `Rental Agreement generated for ${l.name} at ₹${l.rent}/month`);
+  render();
+}
+
+function bookService() {
+  const cust = document.getElementById('sCust').value.trim();
+  const model = document.getElementById('sModel').value.trim();
+  const issue = document.getElementById('sIssue').value;
+  if(!cust || !model) return;
+  tickets.unshift({ id: "SRV-" + (101 + tickets.length), cust, model, issue, status: "In Diagnostics" });
+  render();
+}
+
+function addLaptop() {
+  const name = document.getElementById('lName').value.trim();
+  const spec = document.getElementById('lSpec').value.trim();
+  const price = parseInt(document.getElementById('lPrice').value);
+  const rent = parseInt(document.getElementById('lRent').value) || 2000;
+  if(!name || !price) return;
+  laptops.push({ id: Date.now(), name, spec, price, rent, stock: 6 });
+  render();
+}
+
+function render() {
+  document.getElementById('lapGrid').innerHTML = laptops.map(l => `
+    <div class="card">
+      <h3>${l.name}</h3>
+      <p style="color:#475569; margin:0.4rem 0;">${l.spec}</p>
+      <p><strong>Buy:</strong> ₹${l.price.toLocaleString('en-IN')} | <strong>Rent:</strong> ₹${l.rent}/mo</p>
+      <p style="font-size:0.85rem; margin:0.4rem 0 0.8rem;">Shop Stock: ${l.stock} units</p>
+      <button class="btn" onclick="buyLap(${l.id}, 'buy')">Buy</button>
+      <button class="btn" style="background:#0f172a;" onclick="buyLap(${l.id}, 'rent')">Rent</button>
+    </div>
+  `).join('');
+
+  document.getElementById('ticketList').innerHTML = tickets.map(t =>
+    `<p style="padding:0.5rem 0; border-bottom:1px solid #e2e8f0;"><strong>${t.id}</strong> — ${t.cust} (${t.model}: ${t.issue}) | Status: <b>${t.status}</b></p>`
+  ).join('');
+}
+render();
+</script>
+</body>
+</html>

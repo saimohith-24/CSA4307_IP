@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic Squad | E-Challan Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f1f5f9; color: #0f172a; }
+  header { background: #1e293b; color: #f8fafc; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #334155; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #ef4444; font-weight: bold; }
+  .container { max-width: 980px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.4rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .btn { background: #dc2626; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Traffic Squad E-Challan</h1>
+  <nav>
+    <button class="active" onclick="tab('citizen', this)">Check & Pay Challan</button>
+    <button onclick="tab('police', this)">Traffic Police FIR</button>
+    <button onclick="tab('admin', this)">Admin Daily Report</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="citizen" class="view active">
+    <div class="card">
+      <h2>Search Vehicle Challans</h2>
+      <input id="vehSearch" placeholder="Enter Vehicle No (e.g., TN01AB1234)" oninput="render()">
+      <div id="challanList" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <div id="police" class="view">
+    <div class="card">
+      <h2>Issue Digital Violation Notice / FIR</h2>
+      <input id="pVeh" placeholder="Vehicle Registration No">
+      <select id="pRule">
+        <option value="1000">Riding Without Helmet (₹1,000)</option>
+        <option value="2000">Red Signal Jumping (₹2,000)</option>
+        <option value="1500">Overspeeding in City Zone (₹1,500)</option>
+      </select>
+      <input id="pSpot" placeholder="Junction / Camera Location">
+      <button class="btn" onclick="issueChallan()">Generate E-Challan</button>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Daily Violation & Collection Summary</h2>
+      <div id="dailySummary"></div>
+    </div>
+  </div>
+</div>
+<script>
+let challans = [
+  { id: "CH-901", veh: "TN01AB1234", offense: "Red Signal Jumping", spot: "Kathipara Junction", fine: 2000, paid: false },
+  { id: "CH-902", veh: "AP03CD5678", offense: "Riding Without Helmet", spot: "Alipiri Circle", fine: 1000, paid: true }
+];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function issueChallan() {
+  const veh = document.getElementById('pVeh').value.trim().toUpperCase();
+  const sel = document.getElementById('pRule');
+  const fine = parseInt(sel.value);
+  const offense = sel.options[sel.selectedIndex].text.split(' (')[0];
+  const spot = document.getElementById('pSpot').value.trim() || "Main Highway";
+  if(!veh) return;
+  challans.unshift({ id: "CH-" + (901 + challans.length), veh, offense, spot, fine, paid: false });
+  alert("E-Challan issued to " + veh);
+  render();
+}
+
+function payFine(i) { challans[i].paid = true; alert("Penalty Paid! Digital receipt generated."); render(); }
+
+function render() {
+  const q = document.getElementById('vehSearch').value.trim().toUpperCase();
+  document.getElementById('challanList').innerHTML = challans
+    .map((c, i) => ({ ...c, idx: i }))
+    .filter(c => !q || c.veh.includes(q))
+    .map(c => `
+      <div style="border-bottom:1px solid #e2e8f0; padding:0.8rem 0; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>${c.id} • ${c.veh}</strong> — ${c.offense} (${c.spot})<br>Penalty: <b>₹${c.fine}</b></div>
+        ${c.paid ? '<span style="color:green;font-weight:bold;">✔ PAID</span>' : `<button class="btn" onclick="payFine(${c.idx})">Pay Now</button>`}
+      </div>
+    `).join('');
+
+  const collected = challans.filter(c => c.paid).reduce((s, c) => s + c.fine, 0);
+  const pending = challans.filter(c => !c.paid).reduce((s, c) => s + c.fine, 0);
+  document.getElementById('dailySummary').innerHTML = `
+    <p>Total Cases Filed: <strong>${challans.length}</strong></p>
+    <p>Fines Collected: <strong style="color:green;">₹${collected}</strong></p>
+    <p>Pending Dues: <strong style="color:red;">₹${pending}</strong></p>
+  `;
+}
+render();
+</script>
+</body>
+</html>

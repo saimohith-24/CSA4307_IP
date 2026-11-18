@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookHaven | Curated Online Bookstore</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #fafaf9; color: #1c1917; }
+  header { background: #292524; color: #f5f5f4; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+  nav button { background: transparent; color: #e7e5e4; border: 1px solid #57534e; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; margin: 0.2rem; }
+  nav button.active { background: #d97706; border-color: #d97706; color: #fff; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.2rem; }
+  .btn { background: #b45309; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #d6d3d1; border-radius: 6px; margin-right: 0.4rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>BookHaven</h1>
+  <nav>
+    <button class="active" onclick="tab('catalog', this)">Catalog</button>
+    <button onclick="tab('cart', this)">Cart (<span id="cartCnt">0</span>)</button>
+    <button onclick="tab('about', this)">About & FAQs</button>
+    <button onclick="tab('privacy', this)">Privacy Policy</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="catalog" class="view active">
+    <div class="card">
+      <input id="bSearch" placeholder="Search title or author..." oninput="render()">
+      <select id="bGenre" onchange="render()"><option value="">All Genres</option><option>Academic</option><option>Fiction</option><option>Non-Fiction</option></select>
+    </div>
+    <div class="grid" id="bookGrid"></div>
+  </div>
+
+  <div id="cart" class="view">
+    <div class="card">
+      <h2>Shopping Cart & Checkout</h2>
+      <div id="cartList" style="margin:1rem 0;"></div>
+      <p style="font-weight:bold; font-size:1.15rem; margin-bottom:1rem;">Total: ₹<span id="cartSum">0</span></p>
+      <button class="btn" onclick="placeBookOrder()">Complete Purchase</button>
+    </div>
+  </div>
+
+  <div id="about" class="view">
+    <div class="card">
+      <h2>About BookHaven & Customer FAQs</h2>
+      <p style="margin:0.6rem 0;">BookHaven curates academic engineering texts, contemporary fiction, and biographies with 48-hour nationwide delivery.</p>
+      <p><strong>Q: What is the return window?</strong> A: Unopened books can be returned within 7 days of delivery.</p>
+    </div>
+  </div>
+
+  <div id="privacy" class="view">
+    <div class="card">
+      <h2>Privacy Policy</h2>
+      <p style="margin-top:0.5rem;">We collect shipping addresses and order history solely for order fulfillment and never share customer records with third-party advertisers.</p>
+    </div>
+  </div>
+</div>
+<script>
+const books = [
+  { id: 1, title: "Compilers: Principles, Techniques & Tools", author: "Aho, Lam, Sethi, Ullman", genre: "Academic", price: 890 },
+  { id: 2, title: "The Midnight Library", author: "Matt Haig", genre: "Fiction", price: 399 },
+  { id: 3, title: "Atomic Habits", author: "James Clear", genre: "Non-Fiction", price: 499 },
+  { id: 4, title: "Computer Networking: Top-Down Approach", author: "Kurose & Ross", genre: "Academic", price: 780 }
+];
+let cart = [];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function addBook(id) { cart.push(books.find(b => b.id === id)); render(); }
+function placeBookOrder() { if(!cart.length) return; alert("Order confirmed! Tracking ID sent."); cart = []; render(); }
+
+function render() {
+  const q = document.getElementById('bSearch').value.toLowerCase();
+  const g = document.getElementById('bGenre').value;
+  document.getElementById('bookGrid').innerHTML = books
+    .filter(b => (b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)) && (!g || b.genre === g))
+    .map(b => `<div class="card"><small>${b.genre}</small><h3 style="margin:0.4rem 0;">${b.title}</h3><p style="color:#57534e;">${b.author}</p><p style="font-weight:bold;margin:0.6rem 0;">₹${b.price}</p><button class="btn" onclick="addBook(${b.id})">Add to Cart</button></div>`).join('');
+
+  document.getElementById('cartCnt').innerText = cart.length;
+  document.getElementById('cartSum').innerText = cart.reduce((s, b) => s + b.price, 0);
+  document.getElementById('cartList').innerHTML = cart.map(c => `<p>• ${c.title} — ₹${c.price}</p>`).join('') || "<p>Your cart is empty.</p>";
+}
+render();
+</script>
+</body>
+</html>

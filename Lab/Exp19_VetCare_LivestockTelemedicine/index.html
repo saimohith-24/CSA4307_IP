@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetCare | Livestock Health Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #ecfeff; color: #164e63; }
+  header { background: #0e7490; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #155e75; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #06b6d4; color: #083344; font-weight: bold; }
+  .container { max-width: 980px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+  input, select, textarea { width: 100%; padding: 0.6rem; border: 1px solid #a5f3fc; border-radius: 6px; margin-bottom: 0.7rem; }
+  .btn { background: #0891b2; color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>VetCare Telemedicine</h1>
+  <nav>
+    <button class="active" onclick="show('farmer', this)">Farmer Portal</button>
+    <button onclick="show('doctor', this)">Veterinary Doctor</button>
+    <button onclick="show('analytics', this)">Disease Trends</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="farmer" class="view active">
+    <div class="card">
+      <h2>Consult a Veterinarian</h2>
+      <select id="clinicType"><option>Govt CVH Center (Free Subscription)</option><option>Private Specialist Clinic (₹150 Fee)</option></select>
+      <input id="animalType" placeholder="Animal Type (e.g., Dairy Cow, Goat, Poultry)">
+      <input id="diseaseTag" placeholder="Suspected Condition (e.g., Foot & Mouth, Fever, Mastitis)">
+      <textarea id="symptoms" rows="3" placeholder="Describe signs, temperature, appetite, or media notes..."></textarea>
+      <button class="btn" onclick="submitCase()">Send Case to Doctor</button>
+    </div>
+    <div class="card">
+      <h3>My Veterinary Prescriptions</h3>
+      <div id="farmerCases"></div>
+    </div>
+  </div>
+
+  <div id="doctor" class="view">
+    <div class="card">
+      <h2>Doctor Inbox & Prescription Desk</h2>
+      <div id="docCases"></div>
+    </div>
+  </div>
+
+  <div id="analytics" class="view">
+    <div class="card">
+      <h2>Area-Wise Livestock Disease Surveillance</h2>
+      <div id="diseaseStats"></div>
+    </div>
+  </div>
+</div>
+<script>
+let cases = [
+  { id: "VET-01", animal: "Jersey Cow", condition: "Fever & Low Appetite", clinic: "Govt CVH Center (Free)", symptoms: "High temp since morning", rx: "Administer Paracetamol bolus + electrolytes for 3 days." }
+];
+
+function show(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function submitCase() {
+  const animal = document.getElementById('animalType').value.trim();
+  const condition = document.getElementById('diseaseTag').value.trim() || "General Checkup";
+  const clinic = document.getElementById('clinicType').value;
+  const symptoms = document.getElementById('symptoms').value.trim();
+  if(!animal || !symptoms) return alert("Fill animal type and symptoms");
+  cases.unshift({ id: "VET-0" + (cases.length + 1), animal, condition, clinic, symptoms, rx: "Pending Doctor Review" });
+  render();
+}
+
+function prescribe(i) {
+  const rx = prompt("Enter prescription & dosage instructions:");
+  if(rx) { cases[i].rx = rx; render(); }
+}
+
+function render() {
+  document.getElementById('farmerCases').innerHTML = cases.map(c => `
+    <div style="border-bottom:1px solid #cffafe; padding:0.8rem 0;">
+      <strong>${c.id}: ${c.animal} (${c.condition})</strong> — <small>${c.clinic}</small>
+      <p>Symptoms: ${c.symptoms}</p>
+      <p style="color:#0e7490; font-weight:600;">Doctor Rx: ${c.rx}</p>
+    </div>
+  `).join('');
+
+  document.getElementById('docCases').innerHTML = cases.map((c, i) => `
+    <div style="border-bottom:1px solid #cffafe; padding:0.8rem 0; display:flex; justify-content:space-between; align-items:center;">
+      <div><strong>${c.id} - ${c.animal}</strong> (${c.condition})<br><small>${c.symptoms} | Current Rx: ${c.rx}</small></div>
+      <button class="btn" onclick="prescribe(${i})">Post Solution</button>
+    </div>
+  `).join('');
+
+  const counts = {};
+  cases.forEach(c => counts[c.condition] = (counts[c.condition] || 0) + 1);
+  document.getElementById('diseaseStats').innerHTML = Object.entries(counts)
+    .map(([k, v]) => `<p style="padding:0.5rem 0;">• <strong>${k}</strong>: ${v} reported case(s)</p>`).join('');
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReNewMarket | Pre-Loved Goods</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #fefce8; color: #422006; }
+  header { background: #854d0e; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .toolbar { display: flex; gap: 0.6rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  input, select { padding: 0.55rem; border: 1px solid #fde047; border-radius: 6px; }
+  .btn { background: #ca8a04; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .card { background: #fff; padding: 1.2rem; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+  .cond { background: #fef9c3; color: #854d0e; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: #fff; }
+  th, td { padding: 0.7rem; border-bottom: 1px solid #fef08a; text-align: left; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ReNewMarket</h1>
+  <div>
+    <button class="btn" onclick="toggleSection('sellForm')">+ Post Listing</button>
+    <button class="btn" style="background:#713f12;" onclick="toggleSection('adminOrders')">Logistics Admin</button>
+  </div>
+</header>
+<div class="container">
+  <div class="card" id="sellForm" style="display:none; margin-bottom:1.2rem;">
+    <h3>List a Pre-Owned Item</h3>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:0.5rem; margin-top:0.6rem;">
+      <input id="itemTitle" placeholder="Item Title">
+      <select id="itemCat"><option>Electronics</option><option>Furniture</option><option>Books</option></select>
+      <input id="itemPrice" type="number" placeholder="Asking Price (₹)">
+      <input id="itemCond" placeholder="Condition (e.g., Like New)">
+      <button class="btn" onclick="postListing()">Publish</button>
+    </div>
+  </div>
+
+  <div class="card" id="adminOrders" style="display:none; margin-bottom:1.2rem;">
+    <h3>Order & Logistics Management</h3>
+    <table><thead><tr><th>Order ID</th><th>Item</th><th>Agreed Price</th><th>Status</th><th>Update</th></tr></thead><tbody id="orderRows"></tbody></table>
+  </div>
+
+  <div class="toolbar">
+    <input id="searchBox" placeholder="Search items..." oninput="renderItems()">
+    <select id="catFilter" onchange="renderItems()"><option value="">All Categories</option><option>Electronics</option><option>Furniture</option><option>Books</option></select>
+  </div>
+
+  <div class="grid" id="marketGrid"></div>
+</div>
+<script>
+let items = [
+  { id: 1, title: "Kindle Paperwhite 11th Gen", cat: "Electronics", price: 6500, cond: "Mint Condition" },
+  { id: 2, title: "Ergonomic Mesh Study Chair", cat: "Furniture", price: 3200, cond: "Used - Good" },
+  { id: 3, title: "CLRS Algorithms Textbook", cat: "Books", price: 550, cond: "Like New" }
+];
+let orders = [{ id: "ORD-501", item: "Study Lamp", price: 450, status: "Shipped" }];
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function renderItems() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  const c = document.getElementById('catFilter').value;
+  document.getElementById('marketGrid').innerHTML = items
+    .filter(i => i.title.toLowerCase().includes(q) && (!c || i.cat === c))
+    .map(i => `
+      <div class="card">
+        <span class="cond">${i.cat} • ${i.cond}</span>
+        <h3 style="margin:0.5rem 0;">${i.title}</h3>
+        <p style="font-size:1.2rem; font-weight:bold; margin-bottom:0.8rem;">₹${i.price}</p>
+        <button class="btn" onclick="buyItem('${i.title}', ${i.price})">Buy Now</button>
+        <button class="btn" style="background:#a16207;" onclick="negotiate('${i.title}', ${i.price})">Make Offer</button>
+      </div>
+    `).join('');
+  document.getElementById('orderRows').innerHTML = orders.map((o, idx) =>
+    `<tr><td>${o.id}</td><td>${o.item}</td><td>₹${o.price}</td><td>${o.status}</td><td><button class="btn" onclick="cycleStatus(${idx})">Next Stage</button></td></tr>`
+  ).join('');
+}
+
+function postListing() {
+  const title = document.getElementById('itemTitle').value.trim();
+  const cat = document.getElementById('itemCat').value;
+  const price = parseInt(document.getElementById('itemPrice').value);
+  const cond = document.getElementById('itemCond').value || "Good";
+  if(!title || !price) return;
+  items.unshift({ id: Date.now(), title, cat, price, cond });
+  renderItems();
+}
+
+function buyItem(title, price) {
+  orders.push({ id: "ORD-" + (501 + orders.length), item: title, price, status: "Confirmed" });
+  alert("Purchased " + title + " for ₹" + price);
+  renderItems();
+}
+
+function negotiate(title, price) {
+  const offer = prompt(`Asking price is ₹${price}. Enter your offer (₹):`);
+  if(offer && parseInt(offer) >= price * 0.8) {
+    alert("Seller accepted your offer of ₹" + offer + "!");
+    buyItem(title, parseInt(offer));
+  } else if(offer) {
+    alert("Offer too low. Try closer to asking price.");
+  }
+}
+
+function cycleStatus(i) {
+  const stages = ["Confirmed", "Shipped", "Delivered"];
+  orders[i].status = stages[(stages.indexOf(orders[i].status) + 1) % stages.length];
+  renderItems();
+}
+
+renderItems();
+</script>
+</body>
+</html>

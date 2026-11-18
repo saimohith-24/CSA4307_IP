@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoSort | Smart Waste Management</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f0fdf4; color: #14532d; }
+  header { background: #15803d; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #166534; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #4ade80; color: #052e16; font-weight: bold; }
+  .container { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.2rem; }
+  .btn { background: #16a34a; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #bbf7d0; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .meter { background: #dcfce7; height: 10px; border-radius: 99px; overflow: hidden; margin: 0.4rem 0; }
+  .fill { height: 100%; background: #16a34a; }
+  .high { background: #dc2626 !important; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>EcoSort Municipal</h1>
+  <nav>
+    <button class="active" onclick="show('admin', this)">Admin Dashboard</button>
+    <button onclick="show('driver', this)">Driver Route</button>
+    <button onclick="show('public', this)">Citizen Portal</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="admin" class="view active">
+    <div class="card">
+      <h2>Register Smart Garbage Bin</h2>
+      <input id="binLoc" placeholder="Street / Ward Location">
+      <select id="binType"><option>Wet Organic</option><option>Dry Recyclable</option><option>E-Waste</option></select>
+      <input id="binFill" type="number" placeholder="Fill % (0-100)" value="85">
+      <button class="btn" onclick="addBin()">Add Bin</button>
+    </div>
+    <div class="card">
+      <h3>Live Bin Telemetry & Segregation Status</h3>
+      <div id="binList"></div>
+    </div>
+  </div>
+
+  <div id="driver" class="view">
+    <div class="card">
+      <h2>Priority Collection Route (Sorted by Fill Level)</h2>
+      <div id="routeList"></div>
+    </div>
+  </div>
+
+  <div id="public" class="view">
+    <div class="card">
+      <h2>Report Overflowing Bin / Missed Pickup</h2>
+      <input id="compLoc" placeholder="Landmark / Ward No">
+      <input id="compIssue" placeholder="Issue Details">
+      <button class="btn" onclick="addComplaint()">Submit Report</button>
+      <div id="compFeed" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+</div>
+<script>
+let bins = [
+  { id: "BIN-101", loc: "Market Square North", type: "Wet Organic", fill: 92 },
+  { id: "BIN-102", loc: "Tech Park Gate 2", type: "Dry Recyclable", fill: 45 },
+  { id: "BIN-103", loc: "Central Bus Stand", type: "Wet Organic", fill: 84 }
+];
+let complaints = [{ loc: "Gandhi Road", issue: "Bin lid damaged", status: "Assigned" }];
+
+function show(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function addBin() {
+  const loc = document.getElementById('binLoc').value.trim();
+  const type = document.getElementById('binType').value;
+  const fill = Math.min(100, Math.max(0, parseInt(document.getElementById('binFill').value) || 50));
+  if(!loc) return;
+  bins.push({ id: "BIN-" + (101 + bins.length), loc, type, fill });
+  render();
+}
+
+function collectBin(id) {
+  const b = bins.find(x => x.id === id);
+  if(b) b.fill = 0;
+  render();
+}
+
+function addComplaint() {
+  const loc = document.getElementById('compLoc').value.trim();
+  const issue = document.getElementById('compIssue').value.trim();
+  if(!loc || !issue) return;
+  complaints.unshift({ loc, issue, status: "Dispatched Truck" });
+  render();
+}
+
+function render() {
+  document.getElementById('binList').innerHTML = bins.map(b => `
+    <div style="margin-bottom:0.8rem;">
+      <strong>${b.id} — ${b.loc}</strong> (${b.type}) — <b>${b.fill}% Full</b>
+      <div class="meter"><div class="fill ${b.fill > 75 ? 'high' : ''}" style="width:${b.fill}%"></div></div>
+    </div>
+  `).join('');
+
+  const sorted = [...bins].sort((a, b) => b.fill - a.fill);
+  document.getElementById('routeList').innerHTML = sorted.map((b, idx) => `
+    <div style="padding:0.7rem 0; border-bottom:1px solid #dcfce7; display:flex; justify-content:space-between; align-items:center;">
+      <span><strong>Stop #${idx+1}:</strong> ${b.loc} (${b.id} - ${b.fill}% full)</span>
+      <button class="btn" onclick="collectBin('${b.id}')">Mark Emptied</button>
+    </div>
+  `).join('');
+
+  document.getElementById('compFeed').innerHTML = complaints.map(c => `<p>• <b>${c.loc}</b>: ${c.issue} [${c.status}]</p>`).join('');
+}
+render();
+</script>
+</body>
+</html>

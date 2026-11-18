@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevSphere 2026 | Annual Tech Symposium</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f8fafc; color: #0f172a; }
+  .header { background: linear-gradient(135deg, #0f172a, #1e3a8a); color: #fff; padding: 3rem 1.5rem; text-align: center; }
+  .section { max-width: 960px; margin: 1.5rem auto; padding: 1.8rem; border-radius: 12px; }
+  .purpose { background: #e0f2fe; color: #0c4a6e; }
+  .speakers { background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .schedule { background: #fefce8; color: #422006; }
+  .register { background: #ecfdf5; color: #064e3b; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem; }
+  .spk { border: 1px solid #e2e8f0; padding: 1rem; border-radius: 10px; text-align: center; }
+  .avatar { width: 64px; height: 64px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.3rem; margin: 0 auto 0.6rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; }
+  th, td { padding: 0.7rem; border-bottom: 1px solid #fde047; text-align: left; }
+  input, select { padding: 0.6rem; border: 1px solid #6ee7b7; border-radius: 6px; margin-right: 0.5rem; margin-bottom: 0.5rem; }
+  .btn { background: #059669; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>DevSphere 2026 — AI & Cloud Systems Symposium</h1>
+  <p style="margin-top:0.6rem; color:#93c5fd;">Venue: Convention Auditorium, Chennai • Date: December 18, 2026</p>
+</div>
+
+<div class="section purpose">
+  <h2>Purpose & Target Audience</h2>
+  <p style="margin-top:0.5rem; line-height:1.5;">DevSphere brings together undergraduate computer science students, full-stack developers, and cloud architects to explore production LLM engineering, edge security, and distributed web architectures.</p>
+</div>
+
+<div class="section speakers">
+  <h2>Keynote Speakers</h2>
+  <div class="grid">
+    <div class="spk"><div class="avatar">DR</div><h3>Dr. Ramesh Subramanian</h3><p>Principal AI Architect, CloudScale</p><a href="#schedule">Session: 10:00 AM</a></div>
+    <div class="spk"><div class="avatar">SP</div><h3>Sneha Parthasarathy</h3><p>Staff Security Lead, CyberShield</p><a href="#schedule">Session: 11:30 AM</a></div>
+    <div class="spk"><div class="avatar">AK</div><h3>Arvind Krishnan</h3><p>Open-Source Maintainer</p><a href="#schedule">Session: 02:00 PM</a></div>
+  </div>
+</div>
+
+<div class="section schedule" id="schedule">
+  <h2>Event Schedule</h2>
+  <table>
+    <tr><th>Time</th><th>Session</th><th>Speaker</th></tr>
+    <tr><td>10:00 AM</td><td>Keynote: Scaling Agentic Web Applications</td><td>Dr. Ramesh Subramanian</td></tr>
+    <tr><td>11:30 AM</td><td>Zero-Trust API & Network Auditing</td><td>Sneha Parthasarathy</td></tr>
+    <tr><td>02:00 PM</td><td>Hands-on Workshop: Modern Full-Stack Deployment</td><td>Arvind Krishnan</td></tr>
+  </table>
+</div>
+
+<div class="section register">
+  <h2>Register for Free Student / Developer Pass</h2>
+  <div style="margin-top:0.8rem;">
+    <input id="rName" placeholder="Full Name">
+    <input id="rEmail" placeholder="College / Work Email">
+    <select id="rTrack"><option>Student Pass</option><option>Industry Delegate</option></select>
+    <button class="btn" onclick="regEvent()">Confirm Registration</button>
+  </div>
+  <p id="passOut" style="margin-top:0.8rem; font-weight:bold;"></p>
+</div>
+<script>
+function regEvent() {
+  const n = document.getElementById('rName').value.trim();
+  const e = document.getElementById('rEmail').value.trim();
+  const t = document.getElementById('rTrack').value;
+  if(!n || !e) return alert("Enter name and email");
+  document.getElementById('passOut').innerText = `Registration Confirmed! Pass #DS-${Math.floor(1000+Math.random()*9000)} issued to ${n} (${t}).`;
+}
+</script>
+</body>
+</html>

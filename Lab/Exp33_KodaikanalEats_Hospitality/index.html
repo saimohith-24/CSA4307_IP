@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KodaikanalEats | Dining & Hill Suites</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f0fdf4; color: #064e3b; }
+  header { background: #065f46; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #047857; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #34d399; color: #022c22; font-weight: bold; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .btn { background: #059669; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #a7f3d0; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>KodaikanalEats & Suites</h1>
+  <nav>
+    <button class="active" onclick="tab('dining', this)">Restaurants</button>
+    <button onclick="tab('suites', this)">Suite Booking</button>
+    <button onclick="tab('admin', this)">Admin & Staff</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="dining" class="view active">
+    <div class="card">
+      <select id="cuisineSel" onchange="render()"><option value="">All Cuisines</option><option>South Indian</option><option>Continental</option><option>Tibetan & Grill</option></select>
+    </div>
+    <div class="grid" id="restGrid"></div>
+  </div>
+
+  <div id="suites" class="view">
+    <div class="card">
+      <h2>Book Valley View Suites</h2>
+      <select id="seasonSel" onchange="render()">
+        <option value="1.3">Peak Summer / Winter Season (+30%)</option>
+        <option value="1.0">Non-Seasonal Standard Tariff</option>
+      </select>
+      <div class="grid" id="suiteGrid" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Admin: Room Boys & Reservation Log</h2>
+      <p>On-Duty Room Boys Available: <strong>6 / 8 Staff</strong> (Coaker's Walk Wing)</p>
+      <div id="resLog" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+</div>
+<script>
+const restaurants = [
+  { name: "Cloud Street Bistro", cuisine: "Continental", area: "PT Road, Kodaikanal", rating: "4.8 ★" },
+  { name: "Astoria Veg Heritage", cuisine: "South Indian", area: "Anna Salai", rating: "4.6 ★" },
+  { name: "Royal Tibet Kitchen", cuisine: "Tibetan & Grill", area: "Lake Road", rating: "4.7 ★" }
+];
+let suites = [
+  { type: "Single Cozy Room", base: 2200, avail: 5 },
+  { type: "Double Valley Room", base: 3600, avail: 4 },
+  { type: "Deluxe Pine Suite", base: 5400, avail: 2 }
+];
+let bookings = [];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function bookTable(name) {
+  const guest = prompt(`Reserve table at ${name}. Enter Guest Name & Time:`, "Mohith - 8:00 PM");
+  if(guest) { bookings.unshift(`Table: ${name} (${guest})`); alert("Table reserved!"); render(); }
+}
+
+function bookSuite(i, finalPrice) {
+  if(suites[i].avail <= 0) return alert("Sold out");
+  suites[i].avail--;
+  bookings.unshift(`Suite: ${suites[i].type} — ₹${finalPrice}/night`);
+  alert(`Confirmed ${suites[i].type} at ₹${finalPrice}!`);
+  render();
+}
+
+function render() {
+  const c = document.getElementById('cuisineSel').value;
+  document.getElementById('restGrid').innerHTML = restaurants
+    .filter(r => !c || r.cuisine === c)
+    .map(r => `<div class="card"><h3>${r.name}</h3><p>${r.cuisine} • ${r.area}</p><p style="margin:0.4rem 0 0.8rem;">Rating: <b>${r.rating}</b></p><button class="btn" onclick="bookTable('${r.name}')">Reserve Table</button></div>`).join('');
+
+  const mult = parseFloat(document.getElementById('seasonSel').value);
+  document.getElementById('suiteGrid').innerHTML = suites.map((s, i) => {
+    const rate = Math.round(s.base * mult);
+    return `<div class="card"><h3>${s.type}</h3><p style="font-size:1.2rem;font-weight:bold;margin:0.4rem 0;">₹${rate} / night</p><p style="margin-bottom:0.8rem;">Available: ${s.avail} rooms</p><button class="btn" onclick="bookSuite(${i}, ${rate})">Book Suite</button></div>`;
+  }).join('');
+
+  document.getElementById('resLog').innerHTML = bookings.map(b => `<p style="padding:0.4rem 0;">• ${b}</p>`).join('') || "<p>No reservations yet.</p>";
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InsureEasy | Policy & Agent Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f0fdf4; color: #064e3b; }
+  header { background: #065f46; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #10b981; font-weight: bold; }
+  .container { max-width: 1050px; margin: 2rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { border-bottom: 1px solid #d1fae5; padding: 0.75rem; text-align: left; }
+  th { background: #ecfdf5; }
+  .btn { background: #059669; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; }
+  .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.85rem; }
+  input, select { padding: 0.55rem; border: 1px solid #a7f3d0; border-radius: 6px; margin-right: 0.5rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+  .alert-log { background: #fef3c7; color: #92400e; padding: 0.8rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>InsureEasy</h1>
+  <nav>
+    <button class="active" onclick="switchView('customer', this)">Customer Portal</button>
+    <button onclick="switchView('agent', this)">Agent Desk</button>
+    <button onclick="switchView('admin', this)">Admin Manager</button>
+  </nav>
+</header>
+<div class="container">
+  <!-- CUSTOMER -->
+  <div id="customer" class="view active">
+    <div class="card">
+      <h2>Compare & Buy Insurance Plans</h2>
+      <div class="grid" style="margin-top:1rem;">
+        <div class="card" style="border:1px solid #a7f3d0;">
+          <h3>Health Shield Plus</h3>
+          <p>Cover: ₹10 Lakhs | Cashless Hospitals</p>
+          <p style="font-weight:bold; margin:0.5rem 0;">₹8,500 / year</p>
+          <button class="btn" onclick="buyPolicy('Health Shield Plus', 8500)">Enroll Now</button>
+        </div>
+        <div class="card" style="border:1px solid #a7f3d0;">
+          <h3>AutoDrive Comprehensive</h3>
+          <p>Zero Dep + Roadside Assistance</p>
+          <p style="font-weight:bold; margin:0.5rem 0;">₹5,200 / year</p>
+          <button class="btn" onclick="buyPolicy('AutoDrive Comprehensive', 5200)">Enroll Now</button>
+        </div>
+        <div class="card" style="border:1px solid #a7f3d0;">
+          <h3>HomeSecure Protect</h3>
+          <p>Structure + Contents Fire & Theft</p>
+          <p style="font-weight:bold; margin:0.5rem 0;">₹3,800 / year</p>
+          <button class="btn" onclick="buyPolicy('HomeSecure Protect', 3800)">Enroll Now</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>My Active Policies & Renewal Alerts</h3>
+      <table><thead><tr><th>Policy ID</th><th>Plan Name</th><th>Premium</th><th>Due Date</th><th>Status</th></tr></thead><tbody id="custPolicies"></tbody></table>
+    </div>
+  </div>
+
+  <!-- AGENT -->
+  <div id="agent" class="view">
+    <div class="card">
+      <h2>Agent Customer & SMS Reminder Console</h2>
+      <input type="text" id="custName" placeholder="Customer Name">
+      <input type="text" id="custPhone" placeholder="Mobile Number">
+      <select id="planSelect"><option>Health Shield Plus</option><option>AutoDrive Comprehensive</option></select>
+      <button class="btn" onclick="agentAddCustomer()">Issue Policy</button>
+      <div id="smsFeed" class="alert-log">SMS Gateway Ready: Click "Send SMS Alert" on any policy to notify customer.</div>
+      <table><thead><tr><th>Customer</th><th>Phone</th><th>Policy</th><th>Action</th></tr></thead><tbody id="agentTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Admin: Agent Login Approvals</h2>
+      <table><thead><tr><th>Agent ID</th><th>Name</th><th>Region</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminAgents"></tbody></table>
+    </div>
+  </div>
+</div>
+<script>
+let policies = [
+  { id: "POL-101", customer: "Arjun Sharma", phone: "9876543210", plan: "Health Shield Plus", premium: 8500, due: "2026-12-05", status: "Renewal Due" }
+];
+let agents = [
+  { id: "AGT-01", name: "Kavitha Rao", region: "Chennai", approved: true },
+  { id: "AGT-02", name: "Vikram Nair", region: "Tirupati", approved: false }
+];
+
+function switchView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function renderAll() {
+  document.getElementById('custPolicies').innerHTML = policies.map(p =>
+    `<tr><td>${p.id}</td><td>${p.plan}</td><td>₹${p.premium}</td><td>${p.due}</td><td><strong>${p.status}</strong></td></tr>`
+  ).join('');
+  document.getElementById('agentTable').innerHTML = policies.map((p, idx) =>
+    `<tr><td>${p.customer}</td><td>${p.phone}</td><td>${p.plan}</td><td><button class="btn btn-sm" onclick="sendSMS(${idx})">Send SMS Alert</button></td></tr>`
+  ).join('');
+  document.getElementById('adminAgents').innerHTML = agents.map((a, idx) =>
+    `<tr><td>${a.id}</td><td>${a.name}</td><td>${a.region}</td><td>${a.approved ? 'Approved' : 'Pending'}</td><td><button class="btn btn-sm" onclick="toggleAgent(${idx})">${a.approved ? 'Revoke' : 'Approve'}</button></td></tr>`
+  ).join('');
+}
+
+function buyPolicy(plan, premium) {
+  policies.push({ id: "POL-" + (101 + policies.length), customer: "Self (Online)", phone: "9000011111", plan, premium, due: "2027-11-18", status: "Active" });
+  renderAll();
+  alert("Policy activated: " + plan);
+}
+
+function agentAddCustomer() {
+  const c = document.getElementById('custName').value.trim();
+  const ph = document.getElementById('custPhone').value.trim();
+  const pl = document.getElementById('planSelect').value;
+  if(!c || !ph) return alert("Enter customer name and phone");
+  policies.push({ id: "POL-" + (101 + policies.length), customer: c, phone: ph, plan: pl, premium: 6000, due: "2026-12-15", status: "Issued by Agent" });
+  renderAll();
+}
+
+function sendSMS(i) {
+  const p = policies[i];
+  document.getElementById('smsFeed').innerText = `[SMS SENT to ${p.phone}] Reminder: Dear ${p.customer}, your ${p.plan} (${p.id}) renewal is due on ${p.due}.`;
+}
+
+function toggleAgent(i) { agents[i].approved = !agents[i].approved; renderAll(); }
+renderAll();
+</script>
+</body>
+</html>
