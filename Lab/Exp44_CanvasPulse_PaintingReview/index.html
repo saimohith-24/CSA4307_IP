@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CanvasPulse | Art Rating & Sentiment Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #fdf4ff; color: #4a044e; }
+  header { background: #701a75; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #86198f; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #f0abfc; color: #4a044e; font-weight: bold; }
+  .container { max-width: 980px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.4rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .artwork-banner { height: 180px; border-radius: 10px; background: linear-gradient(135deg, #4a044e, #c026d3, #f59e0b); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 1rem; }
+  .btn { background: #a21caf; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select { padding: 0.55rem; border: 1px solid #f5d0fe; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CanvasPulse Gallery</h1>
+  <nav>
+    <button class="active" onclick="tab('gallery', this)">Rate Exhibition</button>
+    <button onclick="tab('owner', this)">Submit Painting (Owner)</button>
+    <button onclick="tab('admin', this)">Admin Sentiment & Schedule</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="gallery" class="view active">
+    <div class="card">
+      <div class="artwork-banner">
+        <h2 id="artTitle">Twilight Over Marina</h2>
+        <p id="artMeta">By Aarav Menon • Oil on Canvas • Display Package: 15 Days</p>
+      </div>
+      <p style="font-size:1.1rem; margin-bottom:1rem;">Average Rating: <strong id="avgStar">4.5</strong> / 5 ★ (<span id="revCount">2</span> Reviews)</p>
+      <input id="revUser" placeholder="Your Name">
+      <select id="revStars"><option value="5">5 Stars (Masterpiece)</option><option value="4">4 Stars (Impressive)</option><option value="3">3 Stars (Good)</option><option value="2">2 Stars (Needs Polish)</option></select>
+      <input id="revText" placeholder="Write your critique..." style="width:45%;">
+      <button class="btn" onclick="postReview()">Submit Review</button>
+      <div id="reviewFeed" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <div id="owner" class="view">
+    <div class="card">
+      <h2>Owner: Submit Painting & Pay Display Package</h2>
+      <input id="oTitle" placeholder="Painting Title">
+      <input id="oArtist" placeholder="Artist / Owner Name">
+      <select id="oPkg"><option>7 Days Display — ₹500</option><option>15 Days Display — ₹950</option><option>30 Days Featured — ₹1,600</option></select>
+      <button class="btn" onclick="submitPainting()">Pay & Queue Painting</button>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Admin: Sentiment Summary & Display Rotation</h2>
+      <div id="sentimentBox" style="margin:0.8rem 0;"></div>
+      <div id="queueBox"></div>
+    </div>
+  </div>
+</div>
+<script>
+let currentArt = {
+  title: "Twilight Over Marina",
+  artist: "Aarav Menon",
+  pkg: "15 Days",
+  reviews: [
+    { user: "Priya S", stars: 5, text: "Vibrant brushwork and warm sunset palette!" },
+    { user: "Kiran D", stars: 4, text: "Great composition, slightly dark foreground." }
+  ]
+};
+let queuedPaintings = [{ title: "Silent Monsoon", artist: "Nandini R", pkg: "30 Days Featured — ₹1,600" }];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function postReview() {
+  const user = document.getElementById('revUser').value.trim() || "Visitor";
+  const stars = parseInt(document.getElementById('revStars').value);
+  const text = document.getElementById('revText').value.trim();
+  if(!text) return;
+  currentArt.reviews.unshift({ user, stars, text });
+  document.getElementById('revText').value = "";
+  render();
+}
+
+function submitPainting() {
+  const title = document.getElementById('oTitle').value.trim();
+  const artist = document.getElementById('oArtist').value.trim();
+  const pkg = document.getElementById('oPkg').value;
+  if(!title || !artist) return;
+  queuedPaintings.push({ title, artist, pkg });
+  alert("Payment successful! Painting queued for exhibition.");
+  render();
+}
+
+function rotateArt(i) {
+  const next = queuedPaintings.splice(i, 1)[0];
+  currentArt = { title: next.title, artist: next.artist, pkg: next.pkg.split(' —')[0], reviews: [] };
+  render();
+}
+
+function render() {
+  document.getElementById('artTitle').innerText = currentArt.title;
+  document.getElementById('artMeta').innerText = `By ${currentArt.artist} • Display Package: ${currentArt.pkg}`;
+  const avg = currentArt.reviews.length ? (currentArt.reviews.reduce((s, r) => s + r.stars, 0) / currentArt.reviews.length).toFixed(1) : "N/A";
+  document.getElementById('avgStar').innerText = avg;
+  document.getElementById('revCount').innerText = currentArt.reviews.length;
+
+  document.getElementById('reviewFeed').innerHTML = currentArt.reviews.map(r =>
+    `<p style="padding:0.5rem 0; border-bottom:1px solid #f5d0fe;"><strong>${r.user}</strong> (${r.stars}★): ${r.text}</p>`
+  ).join('');
+
+  const pos = currentArt.reviews.filter(r => r.stars >= 4).length;
+  const neg = currentArt.reviews.filter(r => r.stars < 4).length;
+  document.getElementById('sentimentBox').innerHTML = `
+    <p>Current Painting (<strong>${currentArt.title}</strong>): <span style="color:green;">Positive Reviews: ${pos}</span> | <span style="color:#b45309;">Critical/Neutral Reviews: ${neg}</span></p>
+  `;
+  document.getElementById('queueBox').innerHTML = queuedPaintings.map((q, i) =>
+    `<p style="margin-top:0.5rem;">Queued: <strong>${q.title}</strong> by ${q.artist} (${q.pkg}) <button class="btn" onclick="rotateArt(${i})">Publish Now</button></p>`
+  ).join('');
+}
+render();
+</script>
+</body>
+</html>

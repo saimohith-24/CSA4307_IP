@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaxEase | Employee Income Tax Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #f0fdf4; color: #064e3b; }
+  header { background: #065f46; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  .container { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin: 1rem 0; }
+  label { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.3rem; }
+  input { width: 100%; padding: 0.6rem; border: 1px solid #a7f3d0; border-radius: 6px; }
+  .btn { background: #059669; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
+  .summary { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 1.2rem; border-radius: 10px; margin-top: 1rem; line-height: 1.7; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TaxEase India</h1>
+  <span>Employee Income Tax & Deduction Analyzer</span>
+</header>
+<div class="container">
+  <div class="card">
+    <h2>Enter Monthly Salary & Deduction Details (₹)</h2>
+    <div class="grid">
+      <div><label>Monthly Gross Pay (₹)</label><input id="gross" type="number" value="95000"></div>
+      <div><label>Monthly HRA Exemption (₹)</label><input id="hra" type="number" value="15000"></div>
+      <div><label>Monthly Pension / 80C (₹)</label><input id="pension" type="number" value="14000"></div>
+      <div><label>Monthly Health Insurance (₹)</label><input id="health" type="number" value="2000"></div>
+    </div>
+    <button class="btn" onclick="computeTax()">Calculate Annual Tax Liability</button>
+    <div id="taxResult"></div>
+  </div>
+</div>
+<script>
+function computeTax() {
+  const annualGross = (parseFloat(document.getElementById('gross').value) || 0) * 12;
+  const annualHRA = (parseFloat(document.getElementById('hra').value) || 0) * 12;
+  const stdDed = 50000;
+  const annualPension = Math.min(150000, (parseFloat(document.getElementById('pension').value) || 0) * 12);
+  const annualHealth = (parseFloat(document.getElementById('health').value) || 0) * 12;
+
+  const netTaxable = Math.max(0, annualGross - annualHRA - stdDed - annualPension - annualHealth);
+  let tax = 0;
+
+  if(netTaxable > 500000) {
+    if(netTaxable <= 1000000) {
+      tax = 12500 + 0.20 * (netTaxable - 500000);
+    } else {
+      tax = 112500 + 0.30 * (netTaxable - 1000000);
+    }
+  }
+
+  document.getElementById('taxResult').innerHTML = `
+    <div class="summary">
+      <h3>Annual Tax Computation Breakdown</h3>
+      <p>Annual Gross Income: <strong>₹${annualGross.toLocaleString('en-IN')}</strong></p>
+      <p>Total Deductions (HRA ₹${annualHRA.toLocaleString('en-IN')} + Std ₹50,000 + Pension Cap ₹${annualPension.toLocaleString('en-IN')} + Health ₹${annualHealth.toLocaleString('en-IN')}): <strong>₹${(annualHRA + stdDed + annualPension + annualHealth).toLocaleString('en-IN')}</strong></p>
+      <p>Net Taxable Income: <strong>₹${netTaxable.toLocaleString('en-IN')}</strong></p>
+      <p style="font-size:1.2rem; color:#065f46;">Total Income Tax Payable: <strong>₹${tax.toLocaleString('en-IN')}</strong> (Net Post-Tax Income: ₹${(annualGross - tax).toLocaleString('en-IN')})</p>
+      <button class="btn" style="margin-top:0.6rem;" onclick="window.print()">Download Summary Report</button>
+    </div>
+  `;
+}
+computeTax();
+</script>
+</body>
+</html>

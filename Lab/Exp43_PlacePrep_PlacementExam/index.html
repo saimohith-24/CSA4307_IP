@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlacePrep | Campus Placement Exam</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #eef2ff; color: #1e1b4b; }
+  header { background: #312e81; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #4338ca; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #818cf8; color: #1e1b4b; font-weight: bold; }
+  .container { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.4rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  .btn { background: #4f46e5; color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input { padding: 0.55rem; border: 1px solid #c7d2fe; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; }
+  th, td { padding: 0.65rem; border-bottom: 1px solid #e0e7ff; text-align: left; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PlacePrep Exam Portal</h1>
+  <nav>
+    <button class="active" onclick="tab('exam', this)">Attempt Exam</button>
+    <button onclick="tab('results', this)">Merit Rankings</button>
+    <button onclick="tab('admin', this)">Admin Question Bank</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="exam" class="view active">
+    <div class="card">
+      <h2>TCS / Infosys Placement Mock Assessment</h2>
+      <input id="candName" placeholder="Candidate Name & Reg No" value="Y. Sai Mohith (192372210)" style="width:100%; margin:0.6rem 0 1rem;">
+      <div id="qContainer"></div>
+      <button class="btn" onclick="submitExam()">Submit & Evaluate Test</button>
+      <div id="scoreCard" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <div id="results" class="view">
+    <div class="card">
+      <h2>Published Merit List & Rankings</h2>
+      <table><thead><tr><th>Rank</th><th>Candidate</th><th>Score</th><th>Status</th></tr></thead><tbody id="rankBody"></tbody></table>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Admin: Load New MCQ Question</h2>
+      <input id="qText" placeholder="Question Prompt" style="width:100%;">
+      <input id="qOpt1" placeholder="Option A">
+      <input id="qOpt2" placeholder="Option B">
+      <input id="qAns" placeholder="Correct Option (A or B)">
+      <button class="btn" onclick="addQuestion()">Add Question</button>
+    </div>
+  </div>
+</div>
+<script>
+let questions = [
+  { q: "What is the worst-case time complexity of Binary Search?", a: "O(log n)", b: "O(n log n)", ans: "A" },
+  { q: "Which SQL clause is used to filter aggregated group rows?", a: "WHERE", b: "HAVING", ans: "B" },
+  { q: "Which protocol operates at the Transport Layer with reliable delivery?", a: "TCP", b: "ICMP", ans: "A" }
+];
+let leaderboard = [
+  { name: "Ananya R (192372104)", score: 3, total: 3 },
+  { name: "Vikram S (192372188)", score: 2, total: 3 }
+];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function submitExam() {
+  const name = document.getElementById('candName').value.trim() || "Candidate";
+  let score = 0;
+  questions.forEach((item, idx) => {
+    const chosen = document.querySelector(`input[name="q${idx}"]:checked`);
+    if(chosen && chosen.value === item.ans) score++;
+  });
+  const passed = score >= Math.ceil(questions.length / 2);
+  leaderboard.push({ name, score, total: questions.length });
+  leaderboard.sort((x, y) => y.score - x.score);
+
+  document.getElementById('scoreCard').innerHTML = `
+    <div style="background:#eef2ff; padding:1rem; border-radius:8px;">
+      <h3>Scorecard: ${name}</h3>
+      <p style="margin:0.4rem 0;">Score: <strong>${score} / ${questions.length}</strong> — Result: <b style="color:${passed?'green':'red'};">${passed ? 'PASSED' : 'NEEDS RETRY'}</b></p>
+      <button class="btn" onclick="window.print()">Download Scorecard</button>
+      <button class="btn" style="background:#312e81;" onclick="alert('Re-evaluation request logged with Exam Cell.')">Apply Re-evaluation</button>
+    </div>
+  `;
+}
+
+function addQuestion() {
+  const q = document.getElementById('qText').value.trim();
+  const a = document.getElementById('qOpt1').value.trim();
+  const b = document.getElementById('qOpt2').value.trim();
+  const ans = document.getElementById('qAns').value.trim().toUpperCase();
+  if(!q || !a || !b || (ans !== 'A' && ans !== 'B')) return alert("Fill all fields and specify A or B");
+  questions.push({ q, a, b, ans });
+  alert("Question added to exam!");
+  render();
+}
+
+function render() {
+  document.getElementById('qContainer').innerHTML = questions.map((item, idx) => `
+    <div style="margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:1px solid #e0e7ff;">
+      <p style="font-weight:600; margin-bottom:0.4rem;">${idx+1}. ${item.q}</p>
+      <label style="margin-right:1rem;"><input type="radio" name="q${idx}" value="A"> A) ${item.a}</label>
+      <label><input type="radio" name="q${idx}" value="B"> B) ${item.b}</label>
+    </div>
+  `).join('');
+
+  document.getElementById('rankBody').innerHTML = leaderboard.map((r, i) =>
+    `<tr><td>#${i+1}</td><td>${r.name}</td><td>${r.score} / ${r.total}</td><td>${r.score >= Math.ceil(r.total/2) ? 'Qualified' : 'Not Qualified'}</td></tr>`
+  ).join('');
+}
+render();
+</script>
+</body>
+</html>

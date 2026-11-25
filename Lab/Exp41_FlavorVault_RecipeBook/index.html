@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlavorVault | Digital Recipe Book</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #fff7ed; color: #431407; }
+  header { background: #9a3412; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #c2410c; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #fdba74; color: #431407; font-weight: bold; }
+  .container { max-width: 1050px; margin: 1.5rem auto; padding: 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.2rem; }
+  .card { background: #fff; padding: 1.3rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.2rem; }
+  .btn { background: #ea580c; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  input, select, textarea { padding: 0.55rem; border: 1px solid #fed7aa; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>FlavorVault</h1>
+  <nav>
+    <button class="active" onclick="tab('explore', this)">Recipes</button>
+    <button onclick="tab('submit', this)">Share Recipe</button>
+    <button onclick="tab('planner', this)">Shopping List (<span id="shopCnt">0</span>)</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="explore" class="view active">
+    <div class="card" style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
+      <input id="rSearch" placeholder="Search dish or ingredient..." oninput="render()">
+      <select id="rCat" onchange="render()"><option value="">All Categories</option><option>Breakfast</option><option>Main Course</option><option>Dessert</option></select>
+      <label>Servings Multiplier: <input type="number" id="servMult" value="1" min="1" max="10" style="width:65px;" onchange="render()"></label>
+    </div>
+    <div class="grid" id="recipeGrid"></div>
+  </div>
+
+  <div id="submit" class="view">
+    <div class="card">
+      <h2>Upload Your Culinary Creation</h2>
+      <input id="newTitle" placeholder="Recipe Name" style="width:100%;">
+      <select id="newCat"><option>Breakfast</option><option>Main Course</option><option>Dessert</option></select>
+      <input id="newTime" placeholder="Prep Time (e.g., 25 mins)">
+      <input id="newIng" placeholder="Ingredients (comma separated: 200g Paneer, 2 Tomatoes)" style="width:100%;">
+      <textarea id="newSteps" rows="3" placeholder="Step-by-step instructions..." style="width:100%;"></textarea>
+      <button class="btn" onclick="addRecipe()">Publish Recipe</button>
+    </div>
+  </div>
+
+  <div id="planner" class="view">
+    <div class="card">
+      <h2>Weekly Meal Shopping List</h2>
+      <div id="shopList" style="margin:1rem 0;"></div>
+      <button class="btn" onclick="window.print()">Print Shopping List</button>
+    </div>
+  </div>
+</div>
+<script>
+let recipes = [
+  { id: 1, title: "Masala Oats & Veggie Upma", cat: "Breakfast", time: "15 mins", rating: 4.8, ings: [{ name: "Rolled Oats", qty: 100, unit: "g" }, { name: "Mixed Veggies", qty: 80, unit: "g" }], steps: "Roast oats, sauté mustard seeds & veggies, simmer 5 mins." },
+  { id: 2, title: "Hyderabadi Paneer Dum Handi", cat: "Main Course", time: "35 mins", rating: 4.9, ings: [{ name: "Fresh Paneer", qty: 250, unit: "g" }, { name: "Basmati Rice", qty: 200, unit: "g" }], steps: "Marinate paneer in yogurt spices, layer with parboiled rice and dum cook." },
+  { id: 3, title: "Cardamom Coconut Payasam", cat: "Dessert", time: "25 mins", rating: 4.7, ings: [{ name: "Coconut Milk", qty: 200, unit: "ml" }, { name: "Jaggery", qty: 75, unit: "g" }], steps: "Simmer roasted vermicelli in coconut milk and melted jaggery." }
+];
+let shoppingList = [];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function addShopping(id) {
+  const r = recipes.find(x => x.id === id);
+  const mult = parseInt(document.getElementById('servMult').value) || 1;
+  r.ings.forEach(i => shoppingList.push(`${i.qty * mult}${i.unit} ${i.name} (for ${r.title})`));
+  alert("Ingredients added to Shopping List!");
+  render();
+}
+
+function addRecipe() {
+  const title = document.getElementById('newTitle').value.trim();
+  const cat = document.getElementById('newCat').value;
+  const time = document.getElementById('newTime').value.trim() || "20 mins";
+  const rawIng = document.getElementById('newIng').value.trim();
+  const steps = document.getElementById('newSteps').value.trim();
+  if(!title || !rawIng) return alert("Enter recipe title and ingredients");
+  const ings = rawIng.split(',').map(s => ({ name: s.trim(), qty: 1, unit: "x " }));
+  recipes.unshift({ id: Date.now(), title, cat, time, rating: 5.0, ings, steps });
+  alert("Recipe published!");
+  render();
+}
+
+function render() {
+  const q = document.getElementById('rSearch').value.toLowerCase();
+  const c = document.getElementById('rCat').value;
+  const mult = parseInt(document.getElementById('servMult').value) || 1;
+  document.getElementById('recipeGrid').innerHTML = recipes
+    .filter(r => r.title.toLowerCase().includes(q) && (!c || r.cat === c))
+    .map(r => `
+      <div class="card">
+        <small>${r.cat} • ${r.time} • ★ ${r.rating}</small>
+        <h3 style="margin:0.4rem 0;">${r.title}</h3>
+        <p style="font-size:0.9rem; margin-bottom:0.5rem;"><strong>Ingredients (${mult}x):</strong> ${r.ings.map(i => `${i.qty * mult}${i.unit} ${i.name}`).join(', ')}</p>
+        <p style="font-size:0.85rem; color:#7c2d12; margin-bottom:0.8rem;">${r.steps}</p>
+        <button class="btn" onclick="addShopping(${r.id})">+ Add to Shopping List</button>
+      </div>
+    `).join('');
+
+  document.getElementById('shopCnt').innerText = shoppingList.length;
+  document.getElementById('shopList').innerHTML = shoppingList.map(s => `<p style="padding:0.35rem 0; border-bottom:1px solid #fed7aa;">• ${s}</p>`).join('') || "<p>No ingredients added yet.</p>";
+}
+render();
+</script>
+</body>
+</html>

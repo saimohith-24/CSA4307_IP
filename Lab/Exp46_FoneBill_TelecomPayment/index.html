@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoneBill | Telecom Postpaid Portal</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+  body { background: #eff6ff; color: #1e3a8a; }
+  header { background: #1d4ed8; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+  nav button { background: #1e40af; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor: pointer; margin-left: 0.4rem; }
+  nav button.active { background: #60a5fa; color: #172554; font-weight: bold; }
+  .container { max-width: 920px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; padding: 1.4rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 1.2rem; }
+  input, select { padding: 0.6rem; border: 1px solid #bfdbfe; border-radius: 6px; margin-right: 0.4rem; margin-bottom: 0.5rem; }
+  .btn { background: #2563eb; color: #fff; border: none; padding: 0.6rem 1.1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .view { display: none; } .view.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>FoneBill Telecom</h1>
+  <nav>
+    <button class="active" onclick="tab('cust', this)">Customer Dashboard</button>
+    <button onclick="tab('admin', this)">Admin Billing Cycle</button>
+  </nav>
+</header>
+<div class="container">
+  <div id="cust" class="view active">
+    <div class="card">
+      <h2>Postpaid Account: +91 98400 77210 (Unlimited 5G Plan)</h2>
+      <p style="margin:0.5rem 0;">Billing Period: <strong id="pPeriod">01 Nov 2026 – 30 Nov 2026</strong> | Last Date: <strong id="pDue">10 Dec 2026</strong></p>
+      <p style="font-size:1.2rem; margin:0.6rem 0;">Base Bill Due: <strong>₹<span id="baseDue">699</span></strong></p>
+      <div style="margin-top:0.8rem;">
+        <label>Days Past Due Date: <input id="lateDays" type="number" value="0" min="0" style="width:70px;"></label>
+        <input id="payAmt" type="number" placeholder="Payment Amount (₹)" value="699">
+        <select id="payMethod"><option>UPI AutoPay</option><option>Credit / Debit Card</option><option>Net Banking</option></select>
+        <button class="btn" onclick="payPhoneBill()">Pay Bill Now</button>
+      </div>
+      <div id="receiptMsg" style="margin-top:0.8rem; color:#15803d; font-weight:bold;"></div>
+    </div>
+
+    <div class="card">
+      <h3>Payment History</h3>
+      <div id="histList"></div>
+    </div>
+  </div>
+
+  <div id="admin" class="view">
+    <div class="card">
+      <h2>Admin: Update Monthly Billing Window</h2>
+      <input id="admPeriod" value="01 Dec 2026 – 31 Dec 2026">
+      <input id="admDue" value="10 Jan 2027">
+      <button class="btn" onclick="saveCycle()">Publish Monthly Bill Cycle</button>
+      <p style="margin-top:0.8rem; font-size:0.9rem;">Note: Automated late fee of ₹10/day applies after the last date of payment.</p>
+    </div>
+  </div>
+</div>
+<script>
+let dueAmount = 699;
+let history = [{ date: "08 Nov 2026", amount: 699, mode: "UPI AutoPay", id: "TXN-8821" }];
+
+function tab(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  render();
+}
+
+function payPhoneBill() {
+  const late = Math.max(0, parseInt(document.getElementById('lateDays').value) || 0);
+  const fine = late * 10;
+  const totalPayable = dueAmount + fine;
+  const amt = parseFloat(document.getElementById('payAmt').value) || 0;
+  const mode = document.getElementById('payMethod').value;
+  if(amt <= 0) return alert("Enter valid payment amount");
+
+  dueAmount = Math.max(0, totalPayable - amt);
+  const txn = "TXN-" + Math.floor(1000 + Math.random()*9000);
+  history.unshift({ date: new Date().toLocaleDateString(), amount: amt, mode, id: txn });
+  document.getElementById('receiptMsg').innerText = `Receipt ${txn}: Paid ₹${amt} (incl. ₹${fine} fine) via ${mode}. Remaining Balance: ₹${dueAmount}.`;
+  render();
+}
+
+function saveCycle() {
+  document.getElementById('pPeriod').innerText = document.getElementById('admPeriod').value;
+  document.getElementById('pDue').innerText = document.getElementById('admDue').value;
+  dueAmount = 699;
+  alert("New monthly bill cycle published!");
+  render();
+}
+
+function render() {
+  document.getElementById('baseDue').innerText = dueAmount;
+  document.getElementById('histList').innerHTML = history.map(h =>
+    `<p style="padding:0.45rem 0; border-bottom:1px solid #dbeafe;"><strong>${h.id}</strong> — Paid <b>₹${h.amount}</b> via ${h.mode} on ${h.date}</p>`
+  ).join('');
+}
+render();
+</script>
+</body>
+</html>
